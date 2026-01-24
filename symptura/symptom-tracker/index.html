@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Symptura</title>
+    
+    <!-- PWA / Home Screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Symptura">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="apple-touch-icon" href="icon-180x180.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Chart.js for trend visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen active">
+        <div class="auth-container">
+            <h1>Symptura</h1>
+            <p class="auth-subtitle">Track patterns, understand your body</p>
+            
+            <div id="auth-form">
+                <div class="form-group">
+                    <label for="auth-email">Email</label>
+                    <input type="email" id="auth-email" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" autocomplete="current-password" required>
+                </div>
+                <div id="auth-error" class="error-message" hidden></div>
+                <button id="sign-in-btn" class="btn btn-primary">Sign In</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app-container" class="hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-title">Symptura</h1>
+            <button id="settings-btn" class="icon-btn" aria-label="Settings">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Swipeable Screen Container -->
+        <main id="screens-container" class="screens-container">
+            <!-- Log Screen (Home) -->
+            <section id="log-screen" class="app-screen active" data-screen="log">
+                <div class="screen-content">
+                    <!-- Date Selector -->
+                    <div class="date-selector">
+                        <button id="prev-date" class="icon-btn" aria-label="Previous day">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                            </svg>
+                        </button>
+                        <button id="date-display" class="date-display">Today</button>
+                        <button id="next-date" class="icon-btn" aria-label="Next day">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                            </svg>
+                        </button>
+                        <input type="date" id="date-picker" class="hidden-date-picker">
+                    </div>
+
+                    <!-- Daily Note (Collapsed by Default) -->
+                    <div class="daily-note-container">
+                        <button id="toggle-daily-note" class="daily-note-toggle">
+                            <span>Daily Note</span>
+                            <svg id="note-chevron" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                            </svg>
+                        </button>
+                        <div id="daily-note-content" class="daily-note-content collapsed">
+                            <textarea id="daily-note" placeholder="How are you feeling today? Any context to remember..."></textarea>
+                            <button id="save-daily-note" class="btn btn-small">Save Note</button>
+                        </div>
+                    </div>
+
+                    <!-- Symptoms List -->
+                    <div id="symptoms-log-container" class="symptoms-log-container">
+                        <div id="symptoms-log-list" class="symptoms-log-list">
+                            <!-- Symptoms rendered by JS -->
+                        </div>
+                        <div id="no-symptoms-message" class="empty-state">
+                            <p>No symptoms configured yet.</p>
+                            <button id="go-to-settings" class="btn btn-primary">Add Symptoms in Settings</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Screen -->
+            <section id="history-screen" class="app-screen" data-screen="history">
+                <div class="screen-content">
+                    <!-- View Toggle -->
+                    <div class="view-toggle">
+                        <button id="calendar-view-btn" class="view-btn active">Calendar</button>
+                        <button id="trend-view-btn" class="view-btn">Trends</button>
+                    </div>
+
+                    <!-- Symptom Filters -->
+                    <div class="symptom-filters">
+                        <div class="filter-header">
+                            <span>Filter Symptoms</span>
+                            <div class="filter-actions">
+                                <button id="filter-all" class="btn btn-tiny">All</button>
+                                <button id="filter-none" class="btn btn-tiny">None</button>
+                                <button id="export-csv" class="btn btn-tiny">Export CSV</button>
+                            </div>
+                        </div>
+                        <div id="symptom-filter-chips" class="filter-chips">
+                            <!-- Filter chips rendered by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Calendar View -->
+                    <div id="calendar-view" class="history-view active">
+                        <div class="calendar-nav">
+                            <button id="prev-month" class="icon-btn" aria-label="Previous month">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                                </svg>
+                            </button>
+                            <span id="calendar-month-label">January 2025</span>
+                            <button id="next-month" class="icon-btn" aria-label="Next month">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="calendar-header">
+                                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                            </div>
+                            <div id="calendar-days" class="calendar-days">
+                                <!-- Days rendered by JS -->
+                            </div>
+                        </div>
+                        <!-- Day Detail Modal -->
+                        <div id="day-detail-modal" class="modal hidden">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 id="day-detail-date">January 1, 2025</h3>
+                                    <button id="close-day-detail" class="icon-btn" aria-label="Close">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div id="day-detail-content" class="day-detail-content">
+                                    <!-- Entries for selected day -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trend View -->
+                    <div id="trend-view" class="history-view hidden">
+                        <div class="trend-range-selector">
+                            <button id="trend-week" class="range-btn active">Week</button>
+                            <button id="trend-month" class="range-btn">Month</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="trend-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Entry List -->
+                    <div id="entry-list-container" class="entry-list-container">
+                        <h3>Recent Entries</h3>
+                        <div id="entry-list" class="entry-list">
+                            <!-- Entries rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button id="nav-log" class="nav-btn active" data-screen="log">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                <span>Log</span>
+            </button>
+            <button id="nav-history" class="nav-btn" data-screen="history">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                </svg>
+                <span>History</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="close-settings" class="icon-btn" aria-label="Close">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Symptom Management -->
+                <section class="settings-section">
+                    <h3>Manage Symptoms</h3>
+                    <div id="symptom-list" class="symptom-list">
+                        <!-- Symptoms rendered by JS -->
+                    </div>
+                    <div class="add-symptom-form">
+                        <input type="text" id="new-symptom-name" placeholder="New symptom name">
+                        <input type="color" id="new-symptom-color" value="#7c9cb7">
+                        <button id="add-symptom-btn" class="btn btn-primary">Add</button>
+                    </div>
+                </section>
+
+                <!-- Account Section -->
+                <section class="settings-section">
+                    <h3>Account</h3>
+                    <p id="user-email" class="user-email"></p>
+                    <button id="sign-out-btn" class="btn btn-secondary">Sign Out</button>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal" class="modal hidden">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3 id="confirm-title">Confirm Delete</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Are you sure you want to delete this?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-cancel" class="btn btn-secondary">Cancel</button>
+                <button id="confirm-ok" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Entry Modal -->
+    <div id="edit-entry-modal" class="modal hidden">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3>Edit Entry</h3>
+                <button id="close-edit-entry" class="icon-btn" aria-label="Close">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="edit-entry-symptom" class="edit-entry-symptom"></p>
+                <div id="edit-severity-buttons" class="severity-buttons">
+                    <button class="severity-btn" data-severity="mild">Mild</button>
+                    <button class="severity-btn" data-severity="mid">Mid</button>
+                    <button class="severity-btn" data-severity="strong">Strong</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/log.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/export.js"></script>
+</body>
+</html>
