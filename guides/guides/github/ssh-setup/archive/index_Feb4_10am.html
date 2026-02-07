@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub SSH Setup | Guides Hub</title>
+  <link rel="icon" type="image/png" href="../../../guide-icon-64.png">
+  <link rel="stylesheet" href="../../../css/guide.css">
+  <style>
+    /* Copy button styles */
+    .code-container {
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: var(--bg-hover);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .copy-btn:hover {
+      background-color: var(--border-color);
+      color: var(--text-primary);
+    }
+    .copy-btn.copied {
+      background-color: var(--accent-teal);
+      color: var(--text-primary);
+      border-color: var(--accent-teal);
+    }
+    .file-label {
+      display: inline-block;
+      background-color: var(--bg-surface);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px 4px 0 0;
+      margin-bottom: -1px;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="guide-layout">
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../../../index.html" class="sidebar-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Guides Hub
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Guide navigation">
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+      <article class="guide-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../../../index.html" class="breadcrumb-link">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">GitHub SSH Setup</span>
+        </nav>
+
+        <h1 class="guide-title">GitHub SSH Setup</h1>
+        <p class="guide-description">Setting up SSH keys for multiple GitHub accounts on a single computer.</p>
+
+        <div class="quick-reference">
+          <div class="quick-reference-title">Contents</div>
+          <ul>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#generate-keys">Generate SSH Keys</a></li>
+            <li><a href="#config">Create SSH Config File</a></li>
+            <li><a href="#add-to-github">Add Keys to GitHub</a></li>
+            <li><a href="#test">Test the Connections</a></li>
+            <li><a href="#folder-structure">Create Folder Structure</a></li>
+            <li><a href="#clone-repos">Clone Repositories</a></li>
+            <li><a href="#git-identity">Configure Git Identity</a></li>
+            <li><a href="#fix-existing">Fix Existing Repos</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+          </ul>
+        </div>
+
+        <h2 id="how-it-works">How It Works</h2>
+        <p>Each computer needs its own SSH keys - they're stored locally and never shared between machines. This is a security feature: if one machine is compromised or you stop using it, you can revoke just that key without affecting your other computers.</p>
+        <p>When you have multiple GitHub accounts (e.g., personal and work), you create a separate key for each and use an SSH config file to tell your computer which key to use for which account.</p>
+
+        <h2 id="generate-keys">Generate SSH Keys</h2>
+
+        <h3>1. Generate a key for your personal account</h3>
+        <div class="code-container">
+          <pre><code>ssh-keygen -t ed25519 -C "personal" -f ~/.ssh/id_ed25519_personal</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p>Press Enter to accept defaults when prompted. You can set a passphrase or leave it blank.</p>
+
+        <h3>2. Generate a key for your work account</h3>
+        <div class="code-container">
+          <pre><code>ssh-keygen -t ed25519 -C "work" -f ~/.ssh/id_ed25519_work</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">About the -C flag</div>
+          <p>This is just a comment/label to help you identify the key later. It doesn't affect how the key works. You can put anything there - your email, "work laptop", "linux-2025", whatever. GitHub doesn't check or care what it says.</p>
+        </div>
+
+        <h2 id="config">Create SSH Config File</h2>
+
+        <h3>1. Open (or create) the config file</h3>
+        <div class="code-container">
+          <pre><code>nano ~/.ssh/config</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>2. Paste this configuration</h3>
+        <span class="file-label">~/.ssh/config</span>
+        <div class="code-container">
+          <pre><code>Host github.com-personal
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_personal
+
+Host github.com-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>3. Save and exit</h3>
+        <p>Press <strong>Ctrl+O</strong> to save, then <strong>Ctrl+X</strong> to exit nano.</p>
+
+        <h3>4. Set correct permissions</h3>
+        <div class="code-container">
+          <pre><code>chmod 600 ~/.ssh/config</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p>SSH requires the config file to only be readable by you.</p>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">How the aliases work</div>
+          <p>When a repo URL uses <code>git@github.com-personal</code>, it uses your personal key. When it uses <code>git@github.com-work</code>, it uses your work key. These aliases aren't real domains - they're just shortcuts your SSH config intercepts and routes to the real <code>github.com</code> with the correct key.</p>
+        </div>
+
+        <h2 id="add-to-github">Add Keys to GitHub</h2>
+        <p>You need to add each public key to its corresponding GitHub account.</p>
+
+        <h3>1. Copy your personal public key</h3>
+        <div class="code-container">
+          <pre><code>cat ~/.ssh/id_ed25519_personal.pub</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p>Copy the entire output (the whole line starting with <code>ssh-ed25519</code>).</p>
+
+        <h3>2. Add it to your personal GitHub account</h3>
+        <ol>
+          <li>Go to <a href="https://github.com/settings/keys" target="_blank">github.com/settings/keys</a> (while logged into your personal account)</li>
+          <li>Click <strong>New SSH Key</strong></li>
+          <li>Give it a title (e.g., "Linux Desktop")</li>
+          <li>Paste the key into the "Key" field</li>
+          <li>Click <strong>Add SSH Key</strong></li>
+        </ol>
+
+        <h3>3. Copy your work public key</h3>
+        <div class="code-container">
+          <pre><code>cat ~/.ssh/id_ed25519_work.pub</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>4. Add it to your work GitHub account</h3>
+        <p>Log into your work GitHub account and repeat the same steps.</p>
+
+        <h2 id="test">Test the Connections</h2>
+        <p>Verify both keys are working:</p>
+
+        <h3>Test personal account</h3>
+        <div class="code-container">
+          <pre><code>ssh -T git@github.com-personal</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Test work account</h3>
+        <div class="code-container">
+          <pre><code>ssh -T git@github.com-work</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <p>Each should respond with: <code>Hi [username]! You've successfully authenticated...</code></p>
+
+        <div class="callout callout-info">
+          <div class="callout-title">First-time connection</div>
+          <p>If you see a message about "authenticity of host can't be established" with a fingerprint, type <code>yes</code> and press Enter. This is normal - your computer is just confirming it's really GitHub. You'll only see this once per host.</p>
+        </div>
+
+        <h2 id="folder-structure">Create Folder Structure</h2>
+        <p>Create separate folders to keep work and personal repos organized:</p>
+        <div class="code-container">
+          <pre><code>mkdir -p ~/Websites_work ~/Websites_personal</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2 id="clone-repos">Clone Repositories</h2>
+        <p>When cloning repos, use the SSH alias that matches the account. This ensures Git uses the correct key automatically.</p>
+
+        <h3>Clone all work repos (skarlis3)</h3>
+        <div class="code-container">
+          <pre><code>cd ~/Websites_work
+git clone git@github.com-work:skarlis3/1170.git
+git clone git@github.com-work:skarlis3/1181.git
+git clone git@github.com-work:skarlis3/1190.git
+git clone git@github.com-work:skarlis3/2740.git
+git clone git@github.com-work:skarlis3/classes.git
+git clone git@github.com-work:skarlis3/faculty-tools.git
+git clone git@github.com-work:skarlis3/skarlis.git</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Clone all personal repos (sarahlizz3)</h3>
+        <div class="code-container">
+          <pre><code>cd ~/Websites_personal
+git clone git@github.com-personal:sarahlizz3/apps.git
+git clone git@github.com-personal:sarahlizz3/test-repo.git</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2 id="git-identity">Configure Git Identity</h2>
+        <p>Git needs to know your name and email for commits. Since you have two accounts, set this per-repo rather than globally.</p>
+
+        <h3>Set identity for all work repos</h3>
+        <div class="code-container">
+          <pre><code>cd ~/Websites_work
+for d in 1170 1181 1190 2740 classes faculty-tools skarlis; do
+  git -C "$d" config user.name "skarlis3"
+  git -C "$d" config user.email "sarahlizz3@gmail.com"
+done</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Set identity for all personal repos</h3>
+        <div class="code-container">
+          <pre><code>cd ~/Websites_personal
+for d in apps test-repo; do
+  git -C "$d" config user.name "sarahlizz3"
+  git -C "$d" config user.email "sarah.karlis@pm.me"
+done</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">New repos</div>
+          <p>When you clone a new repo in the future, remember to set the identity for it too:</p>
+          <pre><code>cd ~/Websites_work/new-repo
+git config user.name "skarlis3"
+git config user.email "sarahlizz3@gmail.com"</code></pre>
+        </div>
+
+        <h2 id="fix-existing">Fix Existing Repos</h2>
+        <p>If repos were already cloned with HTTPS URLs or plain <code>git@github.com:</code> (without the account alias), you'll get permission errors. Fix them by updating the remote URLs:</p>
+
+        <h3>Fix all work repos</h3>
+        <div class="code-container">
+          <pre><code>cd ~/Websites_work
+git -C 1170 remote set-url origin git@github.com-work:skarlis3/1170.git
+git -C 1181 remote set-url origin git@github.com-work:skarlis3/1181.git
+git -C 1190 remote set-url origin git@github.com-work:skarlis3/1190.git
+git -C 2740 remote set-url origin git@github.com-work:skarlis3/2740.git
+git -C classes remote set-url origin git@github.com-work:skarlis3/classes.git
+git -C faculty-tools remote set-url origin git@github.com-work:skarlis3/faculty-tools.git
+git -C skarlis remote set-url origin git@github.com-work:skarlis3/skarlis.git</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Fix all personal repos</h3>
+        <div class="code-container">
+          <pre><code>cd ~/Websites_personal
+git -C apps remote set-url origin git@github.com-personal:sarahlizz3/apps.git
+git -C test-repo remote set-url origin git@github.com-personal:sarahlizz3/test-repo.git</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Verify a repo's remote URL</h3>
+        <div class="code-container">
+          <pre><code>git remote -v</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p>You should see <code>git@github.com-work:</code> or <code>git@github.com-personal:</code>, not <code>https://</code> or plain <code>git@github.com:</code>.</p>
+
+        <h2 id="troubleshooting">Troubleshooting</h2>
+
+        <h3>Check existing keys</h3>
+        <p>See what keys you have:</p>
+        <div class="code-container">
+          <pre><code>ls -la ~/.ssh</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Permission denied errors</h3>
+        <ul>
+          <li>Make sure you added the <code>.pub</code> (public) key to GitHub, not the private key</li>
+          <li>Check that the key filename in your config matches the actual file</li>
+          <li>Verify you added the key to the correct GitHub account</li>
+          <li>Run <code>chmod 600 ~/.ssh/config</code> if you get "Bad owner or permissions" errors</li>
+        </ul>
+
+        <h3>"Could not resolve hostname" errors</h3>
+        <p>This usually means the SSH config file isn't set up correctly. Double-check the Host entries match what your repo URLs are using.</p>
+
+        <h3>"Author identity unknown" errors</h3>
+        <p>Git doesn't know who you are for commits. Run the git config commands from the <a href="#git-identity">Configure Git Identity</a> section for that repo.</p>
+
+        <h3>Check which account a repo is using</h3>
+        <div class="code-container">
+          <pre><code>git remote -v</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p>Look at the URL - it should contain <code>github.com-work</code> or <code>github.com-personal</code> to match the account that owns the repo.</p>
+
+      </article>
+    </main>
+  </div>
+
+  <script src="../../../js/data.js"></script>
+  <script src="../../../js/nav.js"></script>
+  <script>
+    function copyCode(button) {
+      const codeBlock = button.previousElementSibling.querySelector('code');
+      const text = codeBlock.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        button.textContent = 'Failed';
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

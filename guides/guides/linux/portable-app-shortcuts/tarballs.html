@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarballs | Portable App Shortcuts | Guides Hub</title>
+  <link rel="icon" type="image/png" href="../../../guide-icon-64.png">
+  <link rel="stylesheet" href="../../../css/guide.css">
+  <style>
+    .code-container {
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: var(--bg-hover);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .copy-btn:hover {
+      background-color: var(--border-color);
+      color: var(--text-primary);
+    }
+    .copy-btn.copied {
+      background-color: var(--accent-teal);
+      color: var(--text-primary);
+      border-color: var(--accent-teal);
+    }
+    .file-label {
+      display: inline-block;
+      background-color: var(--bg-surface);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px 4px 0 0;
+      margin-bottom: -1px;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="guide-layout">
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../../../index.html" class="sidebar-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Guides Hub
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Guide navigation">
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+      <article class="guide-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../../../index.html" class="breadcrumb-link">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <a href="index.html" class="breadcrumb-link">Portable App Shortcuts</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">Tarballs</span>
+        </nav>
+
+        <h1 class="guide-title">Tarball/Extracted Programs</h1>
+        <p class="guide-description">Programs distributed as <code>.tar.gz</code> or <code>.tar.xz</code> archives.</p>
+
+        <div class="quick-reference">
+          <div class="quick-reference-title">Contents</div>
+          <ul>
+            <li><a href="#setup">Setting Up an Extracted Program</a></li>
+            <li><a href="#examples">Example Desktop Entries</a></li>
+            <li><a href="#working-directory">Programs Needing a Working Directory</a></li>
+          </ul>
+        </div>
+
+        <h2 id="setup">Setting Up an Extracted Program</h2>
+        <div class="code-container">
+          <pre><code># Extract the archive
+tar -xzf program.tar.gz -C ~/Applications/
+
+# Or for .tar.xz
+tar -xJf program.tar.xz -C ~/Applications/
+
+# Find the executable
+ls ~/Applications/program/
+# Often in bin/ directory: ~/Applications/program/bin/program</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2 id="examples">Example Desktop Entries</h2>
+
+        <h3>JetBrains IDE (PyCharm, IntelliJ, etc.)</h3>
+        <span class="file-label">~/.local/share/applications/pycharm.desktop</span>
+        <div class="code-container">
+          <pre><code>[Desktop Entry]
+Version=1.0
+Type=Application
+Name=PyCharm Community
+GenericName=Python IDE
+Comment=Python IDE for Professional Developers
+Exec=/home/sarah/Applications/pycharm-community/bin/pycharm.sh %f
+Icon=/home/sarah/Applications/pycharm-community/bin/pycharm.png
+Categories=Development;IDE;
+Terminal=false
+StartupWMClass=jetbrains-pycharm-ce</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Firefox Developer Edition</h3>
+        <span class="file-label">~/.local/share/applications/firefox-dev.desktop</span>
+        <div class="code-container">
+          <pre><code>[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Firefox Developer Edition
+GenericName=Web Browser
+Comment=Browse the World Wide Web
+Exec=/home/sarah/Applications/firefox/firefox %u
+Icon=/home/sarah/Applications/firefox/browser/chrome/icons/default/default128.png
+Categories=Network;WebBrowser;
+Terminal=false
+StartupWMClass=firefox-developer-edition
+MimeType=text/html;text/xml;application/xhtml+xml;</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Godot Game Engine</h3>
+        <span class="file-label">~/.local/share/applications/godot.desktop</span>
+        <div class="code-container">
+          <pre><code>[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Godot Engine
+GenericName=Game Engine
+Comment=Multi-platform 2D and 3D game engine
+Exec=/home/sarah/Applications/Godot_v4.2-stable_linux.x86_64
+Icon=godot
+Categories=Development;IDE;
+Terminal=false
+StartupWMClass=Godot</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Discord</h3>
+        <span class="file-label">~/.local/share/applications/discord.desktop</span>
+        <div class="code-container">
+          <pre><code>[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Discord
+GenericName=Internet Messenger
+Comment=All-in-one voice and text chat
+Exec=/home/sarah/Applications/Discord/Discord
+Icon=/home/sarah/Applications/Discord/discord.png
+Categories=Network;InstantMessaging;
+Terminal=false
+StartupWMClass=discord</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2 id="working-directory">Programs Needing a Working Directory</h2>
+        <p>Some programs need to run from their installation directory. Use the <code>Path</code> field:</p>
+
+        <span class="file-label">~/.local/share/applications/legacy-app.desktop</span>
+        <div class="code-container">
+          <pre><code>[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Some Legacy App
+Exec=/home/sarah/Applications/legacyapp/run.sh
+Path=/home/sarah/Applications/legacyapp
+Icon=application-x-executable
+Categories=Utility;
+Terminal=false</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">Finding Icons in Extracted Programs</div>
+          <p>Check these common locations:</p>
+          <ul>
+            <li><code>./icons/</code></li>
+            <li><code>./share/icons/</code></li>
+            <li><code>./resources/</code></li>
+            <li><code>./bin/</code> (sometimes)</li>
+          </ul>
+          <p>Or search: <code>find ~/Applications/myapp -name "*.png" -o -name "*.svg" | head -20</code></p>
+        </div>
+
+        <!-- Page navigation -->
+        <nav class="page-nav">
+          <a href="appimages.html" class="page-nav-link prev">
+            <span class="page-nav-label">Previous</span>
+            <span class="page-nav-title">AppImages</span>
+          </a>
+          <a href="icons.html" class="page-nav-link next">
+            <span class="page-nav-label">Next</span>
+            <span class="page-nav-title">Icons</span>
+          </a>
+        </nav>
+
+      </article>
+    </main>
+  </div>
+
+  <script src="../../../js/data.js"></script>
+  <script src="../../../js/nav.js"></script>
+  <script>
+    function copyCode(button) {
+      const codeBlock = button.previousElementSibling.querySelector('code');
+      const text = codeBlock.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        button.textContent = 'Failed';
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

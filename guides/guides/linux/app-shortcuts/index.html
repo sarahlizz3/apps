@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Menu Shortcuts | Guides Hub</title>
+  <link rel="icon" type="image/png" href="../../../guide-icon-64.png">
+  <link rel="stylesheet" href="../../../css/guide.css">
+  <style>
+    .code-container {
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: var(--bg-hover);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .copy-btn:hover {
+      background-color: var(--border-color);
+      color: var(--text-primary);
+    }
+    .copy-btn.copied {
+      background-color: var(--accent-teal);
+      color: var(--text-primary);
+      border-color: var(--accent-teal);
+    }
+    .file-label {
+      display: inline-block;
+      background-color: var(--bg-surface);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px 4px 0 0;
+      margin-bottom: -1px;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="guide-layout">
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../../../index.html" class="sidebar-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Guides Hub
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Guide navigation">
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+      <article class="guide-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../../../index.html" class="breadcrumb-link">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">App Menu Shortcuts</span>
+        </nav>
+
+        <h1 class="guide-title">App Menu Shortcuts for Local HTML Files</h1>
+        <p class="guide-description">Create clickable launcher shortcuts for local HTML applications on Pop!_OS with COSMIC desktop.</p>
+
+        <div class="quick-reference">
+          <div class="quick-reference-title">Contents</div>
+          <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#quick-start">Quick Start</a></li>
+            <li><a href="#detailed-steps">Detailed Steps</a></li>
+            <li><a href="#field-reference">Field Reference</a></li>
+            <li><a href="#browser-options">Browser Options</a></li>
+          </ul>
+        </div>
+
+        <h2 id="overview">Overview</h2>
+        <p>This guide shows you how to create a clickable shortcut in your applications menu that opens a local HTML file in your default browser. The shortcut will appear in the COSMIC launcher and applications view just like any other app.</p>
+        <p>We'll create a <code>.desktop</code> file, which is the standard way Linux desktop environments handle application shortcuts.</p>
+
+        <h2 id="quick-start">Quick Start</h2>
+        <p>Create a file at <code>~/.local/share/applications/my-app.desktop</code> with this content:</p>
+
+        <div class="code-container">
+          <pre><code>[Desktop Entry]
+Version=1.0
+Type=Application
+Name=My Local App
+Comment=Opens my local HTML application
+Exec=xdg-open /home/YOUR_USERNAME/path/to/your/file.html
+Icon=text-html
+Categories=Utility;
+Terminal=false</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <p>Replace <code>YOUR_USERNAME</code> and the path with your actual values. Save the file, and the app should appear in your launcher.</p>
+
+        <h2 id="detailed-steps">Detailed Steps</h2>
+
+        <h3>Step 1: Create the Applications Directory (if needed)</h3>
+        <p>Open a terminal and run:</p>
+        <div class="code-container">
+          <pre><code>mkdir -p ~/.local/share/applications</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Step 2: Create the .desktop File</h3>
+        <p>You can use any text editor. Here's how with nano:</p>
+        <div class="code-container">
+          <pre><code>nano ~/.local/share/applications/my-local-app.desktop</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Step 3: Add the Desktop Entry Content</h3>
+        <p>Paste the following, customizing the values:</p>
+
+        <span class="file-label">~/.local/share/applications/my-local-app.desktop</span>
+        <div class="code-container">
+          <pre><code>[Desktop Entry]
+Version=1.0
+Type=Application
+Name=My Dashboard
+GenericName=Local Web App
+Comment=My personal dashboard application
+Exec=xdg-open /home/sarah/Projects/dashboard/index.html
+Icon=text-html
+Categories=Utility;
+Terminal=false
+StartupNotify=true</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Step 4: Save and Exit</h3>
+        <p>In nano: Press <code>Ctrl+O</code> to save, then <code>Ctrl+X</code> to exit.</p>
+
+        <h3>Step 5: Make it Executable (Optional but Recommended)</h3>
+        <div class="code-container">
+          <pre><code>chmod +x ~/.local/share/applications/my-local-app.desktop</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Step 6: Verify</h3>
+        <p>Press the <code>Super</code> key to open the COSMIC launcher and search for your app name. It should appear in the results.</p>
+
+        <h2 id="field-reference">Field Reference</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Required</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>[Desktop Entry]</code></td>
+              <td>Yes</td>
+              <td>Header that identifies this as a desktop entry file</td>
+            </tr>
+            <tr>
+              <td><code>Version</code></td>
+              <td>No</td>
+              <td>Desktop entry spec version (use 1.0)</td>
+            </tr>
+            <tr>
+              <td><code>Type</code></td>
+              <td>Yes</td>
+              <td>Must be <code>Application</code> for launchable apps</td>
+            </tr>
+            <tr>
+              <td><code>Name</code></td>
+              <td>Yes</td>
+              <td>The name shown in the menu and launcher</td>
+            </tr>
+            <tr>
+              <td><code>GenericName</code></td>
+              <td>No</td>
+              <td>Generic description (e.g., "Web Browser")</td>
+            </tr>
+            <tr>
+              <td><code>Comment</code></td>
+              <td>No</td>
+              <td>Tooltip text shown on hover</td>
+            </tr>
+            <tr>
+              <td><code>Exec</code></td>
+              <td>Yes</td>
+              <td>Command to run. Use <code>xdg-open</code> for HTML files</td>
+            </tr>
+            <tr>
+              <td><code>Icon</code></td>
+              <td>No</td>
+              <td>Icon name or full path to icon file</td>
+            </tr>
+            <tr>
+              <td><code>Categories</code></td>
+              <td>No</td>
+              <td>Menu categories (semicolon-separated, ends with semicolon)</td>
+            </tr>
+            <tr>
+              <td><code>Terminal</code></td>
+              <td>No</td>
+              <td>Set to <code>false</code> for GUI apps</td>
+            </tr>
+            <tr>
+              <td><code>StartupNotify</code></td>
+              <td>No</td>
+              <td>Show loading indicator while app starts</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 id="browser-options">Browser Options</h2>
+        <p>If you want to force a specific browser instead of the system default:</p>
+
+        <div class="code-container">
+          <pre><code># For Firefox
+Exec=firefox /home/sarah/Projects/dashboard/index.html
+
+# For Chromium/Chrome (opens as app-like window)
+Exec=chromium --app=file:///home/sarah/Projects/dashboard/index.html
+
+# For Google Chrome
+Exec=google-chrome --app=file:///home/sarah/Projects/dashboard/index.html</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">App Mode</div>
+          <p>The <code>--app=</code> flag opens the page without browser chrome (no address bar, tabs, etc.), making it feel more like a native application.</p>
+        </div>
+
+        <!-- Page navigation -->
+        <nav class="page-nav">
+          <span class="page-nav-link prev disabled"></span>
+          <a href="icons.html" class="page-nav-link next">
+            <span class="page-nav-label">Next</span>
+            <span class="page-nav-title">Choosing an Icon</span>
+          </a>
+        </nav>
+
+      </article>
+    </main>
+  </div>
+
+  <script src="../../../js/data.js"></script>
+  <script src="../../../js/nav.js"></script>
+  <script>
+    function copyCode(button) {
+      const codeBlock = button.previousElementSibling.querySelector('code');
+      const text = codeBlock.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        button.textContent = 'Failed';
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

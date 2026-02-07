@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompting - Claude Code for Linux | Guides Hub</title>
+  <link rel="icon" type="image/png" href="../../../guide-icon-64.png">
+  <link rel="stylesheet" href="../../../css/guide.css">
+  <style>
+    .prompt-example {
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      margin: var(--spacing-sm) 0;
+    }
+    .prompt-example.good {
+      border-left: 3px solid var(--accent-teal);
+    }
+    .prompt-example.bad {
+      border-left: 3px solid var(--accent-plum);
+    }
+    .prompt-example .label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: var(--spacing-xs);
+    }
+    .prompt-example.good .label {
+      color: var(--accent-teal);
+    }
+    .prompt-example.bad .label {
+      color: var(--accent-plum);
+    }
+    .comparison-table {
+      width: 100%;
+      margin: var(--spacing-lg) 0;
+      font-size: 0.9rem;
+    }
+    .comparison-table th {
+      background: var(--bg-surface);
+      padding: var(--spacing-sm) var(--spacing-md);
+      text-align: left;
+      border-bottom: 2px solid var(--accent-purple);
+    }
+    .comparison-table td {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+    .comparison-table tr:hover td {
+      background: var(--bg-hover);
+    }
+  </style>
+</head>
+<body>
+  <div class="guide-layout">
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../../../index.html" class="sidebar-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Guides Hub
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Guide navigation">
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+      <article class="guide-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../../../index.html" class="breadcrumb-link">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <a href="index.html" class="breadcrumb-link">Claude Code for Linux</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">Prompting</span>
+        </nav>
+
+        <h1 class="guide-title">Writing Effective Prompts</h1>
+        <p class="guide-description">The quality of your prompts directly affects the quality of Claude's output.</p>
+
+        <h2>Key Principles</h2>
+
+        <h3>1. Be Clear and Specific</h3>
+        <p>Don't describe the symptom—describe the problem and your constraints.</p>
+        <div class="prompt-example bad">
+          <div class="label">Vague:</div>
+          <code>"The app is slow"</code>
+        </div>
+        <div class="prompt-example good">
+          <div class="label">Clear:</div>
+          <code>"Typing in the search box is sluggish when there are more than 200 results. Profile the SearchResults component and find what's blocking the main thread."</code>
+        </div>
+
+        <h3>2. Be Explicit About What You Want</h3>
+        <p>If something matters to you, say it.</p>
+        <div class="prompt-example bad">
+          <div class="label">Implicit:</div>
+          <code>"Add a user registration endpoint"</code>
+        </div>
+        <div class="prompt-example good">
+          <div class="label">Explicit:</div>
+          <code>"Add a user registration endpoint with email validation, password hashing using bcrypt, and rate limiting. Include unit tests."</code>
+        </div>
+
+        <h3>3. Give Context and Constraints</h3>
+        <p>Tell Claude what it's working with and what boundaries exist.</p>
+        <ul>
+          <li>Reference specific files with <code>@</code></li>
+          <li>Mention relevant dependencies or APIs</li>
+          <li>Explain why something needs to work a certain way</li>
+        </ul>
+
+        <h3>4. One Mode Per Prompt</h3>
+        <p>Don't mix different types of work in one prompt:</p>
+        <ul>
+          <li><strong>Build mode:</strong> "Create X" or "Implement Y"</li>
+          <li><strong>Debug mode:</strong> "Here's the error, here's the log, find the bug"</li>
+          <li><strong>Learn mode:</strong> "Explain how X works"</li>
+          <li><strong>Critique mode:</strong> "Review this code for security issues"</li>
+        </ul>
+
+        <h3>5. Tell Claude How to Solve, Not Just What's Broken</h3>
+        <p>If you have domain knowledge about the fix, share it.</p>
+        <div class="prompt-example bad">
+          <div class="label">What's broken:</div>
+          <code>"Users are getting logged out too fast"</code>
+        </div>
+        <div class="prompt-example good">
+          <div class="label">How to fix:</div>
+          <code>"Users are being logged out after 5 minutes. The session timeout in @config/auth.ts should be 3600 seconds, not 300. Find where this is set and fix it."</code>
+        </div>
+
+        <h3>6. Request Action, Not Suggestions</h3>
+        <p>Claude Code can make changes directly. Ask for what you want done.</p>
+        <div class="prompt-example bad">
+          <div class="label">Passive:</div>
+          <code>"Can you suggest some changes to improve this function?"</code>
+        </div>
+        <div class="prompt-example good">
+          <div class="label">Active:</div>
+          <code>"Refactor this function to improve its performance. Then run the tests."</code>
+        </div>
+
+        <h2>Prompt Comparison Examples</h2>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Less Effective</th>
+              <th>More Effective</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>"Fix the bug"</td>
+              <td>"The login form throws 'Cannot read property email of undefined' when submitted empty. Check @src/components/LoginForm.tsx for missing null checks."</td>
+            </tr>
+            <tr>
+              <td>"Make the code better"</td>
+              <td>"Refactor @src/api/users.ts to use async/await instead of .then() chains. Add proper error handling that returns appropriate HTTP status codes."</td>
+            </tr>
+            <tr>
+              <td>"Add tests"</td>
+              <td>"Add unit tests for validateEmail and validatePassword in @src/lib/validation.ts. Test valid inputs, edge cases (empty strings, special characters), and invalid formats. Use Jest."</td>
+            </tr>
+            <tr>
+              <td>"Why is this slow?"</td>
+              <td>"The UserList component re-renders on every keystroke in the search box. Profile render performance and implement memoization where appropriate."</td>
+            </tr>
+            <tr>
+              <td>"Help with git"</td>
+              <td>"I have merge conflicts in @src/config.ts between main and feature-branch. Show me the conflicts, explain what each version does, and help me choose the right resolution."</td>
+            </tr>
+            <tr>
+              <td>"Review my code"</td>
+              <td>"Review @src/auth/session.ts for security vulnerabilities, particularly around token handling, session expiration, and CSRF protection."</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>The Pattern</h2>
+        <p>Effective prompts typically include:</p>
+        <ul>
+          <li><strong>What</strong> needs to happen (specific action)</li>
+          <li><strong>Where</strong> it should happen (file paths with @)</li>
+          <li><strong>Why</strong> (context about the problem or goal)</li>
+          <li><strong>How</strong> (constraints, patterns to follow, tools to use)</li>
+          <li><strong>Verification</strong> (how to confirm it worked)</li>
+        </ul>
+
+        <!-- Page Navigation -->
+        <nav class="page-nav">
+          <a href="project-memory.html" class="page-nav-link prev">
+            <span class="page-nav-label">Previous</span>
+            <span class="page-nav-title">Project Memory</span>
+          </a>
+          <a href="advanced.html" class="page-nav-link next">
+            <span class="page-nav-label">Next</span>
+            <span class="page-nav-title">Advanced</span>
+          </a>
+        </nav>
+
+      </article>
+    </main>
+  </div>
+
+  <script src="../../../js/data.js"></script>
+  <script src="../../../js/nav.js"></script>
+</body>
+</html>

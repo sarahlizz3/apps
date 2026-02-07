@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced - Claude Code for Linux | Guides Hub</title>
+  <link rel="icon" type="image/png" href="../../../guide-icon-64.png">
+  <link rel="stylesheet" href="../../../css/guide.css">
+  <style>
+    .code-container {
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: var(--bg-hover);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .copy-btn:hover {
+      background-color: var(--border-color);
+      color: var(--text-primary);
+    }
+    .copy-btn.copied {
+      background-color: var(--accent-teal);
+      color: var(--text-primary);
+      border-color: var(--accent-teal);
+    }
+  </style>
+</head>
+<body>
+  <div class="guide-layout">
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../../../index.html" class="sidebar-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Guides Hub
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Guide navigation">
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+      <article class="guide-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../../../index.html" class="breadcrumb-link">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <a href="index.html" class="breadcrumb-link">Claude Code for Linux</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">Advanced</span>
+        </nav>
+
+        <h1 class="guide-title">Advanced Usage</h1>
+        <p class="guide-description">Headless mode, custom commands, session management, and more.</p>
+
+        <h2>Headless Mode</h2>
+        <p>Run Claude Code without an interactive session for scripts and automation:</p>
+        <div class="code-container">
+          <pre><code># One-off query
+claude -p "Explain what this project does"
+
+# Get JSON output for scripts
+claude -p "List all API endpoints" --output-format json
+
+# Streaming JSON for real-time processing
+claude -p "Analyze this log file" --output-format stream-json</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2>Session Management</h2>
+        <div class="code-container">
+          <pre><code># Continue last session
+claude -c
+
+# Resume a specific session
+claude --resume
+
+# List recent sessions
+claude --list</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2>Custom Slash Commands</h2>
+        <p>Create reusable command templates by adding markdown files to <code>.claude/commands/</code>:</p>
+
+        <h3>Example: PR Command</h3>
+        <p>Create <code>.claude/commands/pr.md</code>:</p>
+        <div class="code-container">
+          <pre><code>---
+description: Prepare and create a pull request
+---
+
+Prepare a pull request for the current changes:
+1. Run linting and fix any issues
+2. Run tests and ensure they pass
+3. Stage all changes
+4. Write a descriptive commit message following conventional commits
+5. Push the branch
+6. Create a PR with gh cli including:
+   - Clear title summarizing the change
+   - Description of what changed and why
+   - Any testing notes</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <p>Then use it with:</p>
+        <div class="code-container">
+          <pre><code>> /pr</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Commands with Arguments</h3>
+        <p>Create <code>.claude/commands/issue.md</code>:</p>
+        <div class="code-container">
+          <pre><code>---
+argument-hint: [issue-number]
+description: Fix a GitHub issue
+---
+
+Analyze and fix GitHub issue #$ARGUMENTS:
+1. Use gh issue view to get issue details
+2. Search the codebase for relevant files
+3. Implement the fix
+4. Run tests
+5. Create a commit with "Fixes #$ARGUMENTS" in the message</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <p>Use with:</p>
+        <div class="code-container">
+          <pre><code>> /issue 42</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2>Model Selection</h2>
+        <p>Claude Code supports different models:</p>
+        <div class="code-container">
+          <pre><code># Use Claude Sonnet (faster, cheaper)
+export ANTHROPIC_MODEL="claude-sonnet-4-5-20250929"
+
+# Use Claude Opus (most capable)
+export ANTHROPIC_MODEL="claude-opus-4-5-20251101"</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2>Parallel Sessions</h2>
+        <p>Run multiple Claude instances for different tasks:</p>
+        <div class="code-container">
+          <pre><code># Terminal 1: Working on feature
+cd project && claude
+
+# Terminal 2: Running tests and review
+cd project && claude -p "Run all tests and explain any failures"</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2>Git Workflow Integration</h2>
+        <p>Claude Code excels at git operations. Many developers use it for 90%+ of their git work:</p>
+        <div class="code-container">
+          <pre><code>> What changed since the last release?
+> Write a commit message for my staged changes
+> Help me resolve merge conflicts in @package.json
+> Create a PR for this branch with a description of changes
+> Who last modified the authentication module and why?</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h2>Using External CLIs</h2>
+        <p>Tell Claude to use CLI tools you have installed:</p>
+        <div class="code-container">
+          <pre><code>> Use gh to list open issues labeled "bug"
+> Use aws cli to check the S3 bucket permissions
+> Use docker to show running containers</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">Tip</div>
+          <p>If you frequently use external tools, document them in your project's CLAUDE.md so Claude knows they're available.</p>
+        </div>
+
+        <!-- Page Navigation -->
+        <nav class="page-nav">
+          <a href="prompting.html" class="page-nav-link prev">
+            <span class="page-nav-label">Previous</span>
+            <span class="page-nav-title">Prompting</span>
+          </a>
+          <a href="troubleshooting.html" class="page-nav-link next">
+            <span class="page-nav-label">Next</span>
+            <span class="page-nav-title">Troubleshooting</span>
+          </a>
+        </nav>
+
+      </article>
+    </main>
+  </div>
+
+  <script src="../../../js/data.js"></script>
+  <script src="../../../js/nav.js"></script>
+  <script>
+    function copyCode(button) {
+      const codeBlock = button.previousElementSibling.querySelector('code');
+      const text = codeBlock.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        button.textContent = 'Failed';
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

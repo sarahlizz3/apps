@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Troubleshooting - Claude Code for Linux | Guides Hub</title>
+  <link rel="icon" type="image/png" href="../../../guide-icon-64.png">
+  <link rel="stylesheet" href="../../../css/guide.css">
+  <style>
+    .code-container {
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: var(--bg-hover);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .copy-btn:hover {
+      background-color: var(--border-color);
+      color: var(--text-primary);
+    }
+    .copy-btn.copied {
+      background-color: var(--accent-teal);
+      color: var(--text-primary);
+      border-color: var(--accent-teal);
+    }
+  </style>
+</head>
+<body>
+  <div class="guide-layout">
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../../../index.html" class="sidebar-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Guides Hub
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Guide navigation">
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+      <article class="guide-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../../../index.html" class="breadcrumb-link">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <a href="index.html" class="breadcrumb-link">Claude Code for Linux</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">Troubleshooting</span>
+        </nav>
+
+        <h1 class="guide-title">Troubleshooting</h1>
+        <p class="guide-description">Common issues and solutions for Claude Code on Linux.</p>
+
+        <h2>Diagnostic Command</h2>
+        <div class="code-container">
+          <pre><code>claude doctor</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p>This auto-detects most configuration issues and suggests fixes.</p>
+
+        <h2>Common Issues</h2>
+
+        <h3>"Command not found: claude"</h3>
+        <p>The binary isn't in your PATH. Add it:</p>
+        <div class="code-container">
+          <pre><code># For native installation
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# For npm installation
+echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Permission Errors with npm</h3>
+        <p>Never use <code>sudo</code> with npm. Instead, configure a user directory:</p>
+        <div class="code-container">
+          <pre><code>mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Authentication Failures</h3>
+        <ol>
+          <li>Check your API key: <code>echo $ANTHROPIC_API_KEY</code></li>
+          <li>Verify it starts with <code>sk-ant-</code></li>
+          <li>Check billing status at <a href="https://console.anthropic.com">console.anthropic.com</a></li>
+          <li>Try re-authenticating: close Claude and run <code>claude</code> again</li>
+        </ol>
+
+        <h3>Segmentation Fault</h3>
+        <p>Usually means mixed or outdated installation. Clean reinstall:</p>
+        <div class="code-container">
+          <pre><code># Remove old installation
+npm uninstall -g @anthropic-ai/claude-code
+rm -rf ~/.claude ~/.npm/_cacache
+
+# Clean install with native method
+curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Context Window Getting Full</h3>
+        <p>Long conversations consume the context window. Manage it:</p>
+        <div class="code-container">
+          <pre><code>> /context    # Check usage
+> /compact    # Compress while preserving key info
+> /clear      # Start fresh if needed</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Claude Keeps Asking for Permission</h3>
+        <p>Configure default permissions to reduce prompts:</p>
+        <div class="code-container">
+          <pre><code>> /permissions</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p>Or add trusted operations to your settings.</p>
+
+        <h2>Getting Help</h2>
+        <ul>
+          <li>In-app: <code>/bug</code> to report issues</li>
+          <li>Documentation: <a href="https://claude.ai/code">claude.ai/code</a></li>
+          <li>GitHub: <a href="https://github.com/anthropics/claude-code">github.com/anthropics/claude-code</a></li>
+        </ul>
+
+        <h2>Uninstalling</h2>
+        <div class="code-container">
+          <pre><code># Remove binary
+rm -rf ~/.local/bin/claude
+rm -rf ~/.local/share/claude
+rm -rf ~/.claude/bin
+
+# Remove configuration (optional - deletes all settings)
+rm -rf ~/.claude
+rm ~/.claude.json
+
+# Remove project settings (from project directory)
+rm -rf .claude
+rm .mcp.json</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <!-- Page Navigation -->
+        <nav class="page-nav">
+          <a href="advanced.html" class="page-nav-link prev">
+            <span class="page-nav-label">Previous</span>
+            <span class="page-nav-title">Advanced</span>
+          </a>
+          <span></span>
+        </nav>
+
+      </article>
+    </main>
+  </div>
+
+  <script src="../../../js/data.js"></script>
+  <script src="../../../js/nav.js"></script>
+  <script>
+    function copyCode(button) {
+      const codeBlock = button.previousElementSibling.querySelector('code');
+      const text = codeBlock.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        button.textContent = 'Failed';
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

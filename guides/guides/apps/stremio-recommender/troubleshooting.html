@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Troubleshooting - Stremio Recommender | Guides Hub</title>
+  <link rel="icon" type="image/png" href="../../../guide-icon-64.png">
+  <link rel="stylesheet" href="../../../css/guide.css">
+</head>
+<body>
+  <div class="guide-layout">
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../../../index.html" class="sidebar-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Guides Hub
+        </a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Guide navigation">
+        <!-- Navigation populated by nav.js -->
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+      <article class="guide-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../../../index.html" class="breadcrumb-link">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <a href="index.html" class="breadcrumb-link">Stremio Recommender</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">Troubleshooting</span>
+        </nav>
+
+        <h1 class="guide-title">Troubleshooting</h1>
+        <p class="guide-description">Common issues and how to fix them</p>
+
+        <h2>Common Issues</h2>
+
+        <h3>Addon Not Showing in Stremio</h3>
+        <ul>
+          <li>Make sure the addon is running (<code>npm start</code> in the addon folder)</li>
+          <li>Check if the addon is installed: Stremio > Settings > Addons</li>
+          <li>Try reinstalling: remove the addon and add <code>http://localhost:7000/manifest.json</code></li>
+        </ul>
+
+        <h3>No Recommendations Appearing</h3>
+        <ul>
+          <li>Open the dashboard and click "Generate" to create recommendations</li>
+          <li>Check if your API keys are configured correctly</li>
+          <li>Look at the terminal running the addon for error messages</li>
+        </ul>
+
+        <h3>Dashboard Won't Load</h3>
+        <ul>
+          <li>Verify the addon is running (check terminal output)</li>
+          <li>Make sure nothing else is using port 7000</li>
+          <li>Try <code>http://127.0.0.1:7000</code> instead of localhost</li>
+        </ul>
+
+        <h3>Generation Fails or Times Out</h3>
+        <ul>
+          <li>Check your Claude API key is valid and has credits</li>
+          <li>Check your TMDb API key is valid</li>
+          <li>Try generating again - transient errors can occur</li>
+        </ul>
+
+        <h2 id="background-service">Running as a Background Service</h2>
+        <p>To have the addon start automatically and run in the background, use pm2:</p>
+
+        <h3>Install pm2</h3>
+        <pre><code>npm install -g pm2</code></pre>
+
+        <h3>Start the Addon with pm2</h3>
+        <pre><code>cd ~/Apps/stremio-recommender
+pm2 start npm --name "stremio-recommender" -- start</code></pre>
+
+        <h3>Save pm2 Configuration</h3>
+        <pre><code>pm2 save</code></pre>
+
+        <h3>Set pm2 to Start on Boot</h3>
+        <pre><code>pm2 startup</code></pre>
+        <p>This will output a command to run. Copy and run that command.</p>
+
+        <h3>Useful pm2 Commands</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>What It Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>pm2 status</code></td>
+              <td>Show all running processes</td>
+            </tr>
+            <tr>
+              <td><code>pm2 logs stremio-recommender</code></td>
+              <td>View addon logs</td>
+            </tr>
+            <tr>
+              <td><code>pm2 restart stremio-recommender</code></td>
+              <td>Restart the addon</td>
+            </tr>
+            <tr>
+              <td><code>pm2 stop stremio-recommender</code></td>
+              <td>Stop the addon</td>
+            </tr>
+            <tr>
+              <td><code>pm2 delete stremio-recommender</code></td>
+              <td>Remove from pm2</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>File Reference</h2>
+        <p>Key files in the addon folder (<code>~/Apps/stremio-recommender/</code>):</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>taste-profile.json</code></td>
+              <td>Your preferences for recommendations</td>
+            </tr>
+            <tr>
+              <td><code>data/recommendations.json</code></td>
+              <td>Current recommendations list</td>
+            </tr>
+            <tr>
+              <td><code>data/dismissed.json</code></td>
+              <td>Titles you've dismissed</td>
+            </tr>
+            <tr>
+              <td><code>.env</code></td>
+              <td>API keys (Claude, TMDb)</td>
+            </tr>
+            <tr>
+              <td><code>config.json</code></td>
+              <td>Addon configuration</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">Backup Tip</div>
+          <p>Back up <code>taste-profile.json</code> and <code>data/dismissed.json</code> - these contain your personalization data.</p>
+        </div>
+
+        <h2>Getting Help</h2>
+        <p>If you're still having issues:</p>
+        <ol>
+          <li>Check the terminal output for error messages</li>
+          <li>Look at pm2 logs if running as a service</li>
+          <li>Verify all API keys are correctly set in <code>.env</code></li>
+        </ol>
+
+        <!-- Page navigation -->
+        <nav class="page-nav">
+          <a href="managing.html" class="page-nav-link prev">
+            <span class="page-nav-label">Previous</span>
+            <span class="page-nav-title">Managing Recommendations</span>
+          </a>
+          <div></div>
+        </nav>
+
+        <!-- Related guides -->
+        <section class="related-guides">
+          <h3 class="related-guides-title">Related Guides</h3>
+          <ul class="related-guides-list">
+            <li><a href="#" class="related-guide-link">Linux Background Services</a></li>
+          </ul>
+        </section>
+      </article>
+    </main>
+  </div>
+
+  <script src="../../../js/data.js"></script>
+  <script src="../../../js/nav.js"></script>
+</body>
+</html>

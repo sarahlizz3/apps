@@ -1,0 +1,151 @@
+{
+  "categories": [
+    {
+      "id": "app-use",
+      "label": "App Use & Maintenance",
+      "icon": "settings",
+      "color": "#5b7fb5",
+      "children": [
+        {
+          "id": "draft-diff-checker",
+          "label": "Draft Diff Checker",
+          "href": "guides/apps/draft-diff-checker/index.html",
+          "description": "Local browser tool for comparing student draft revisions"
+        },
+        {
+          "id": "stremio-recommender",
+          "label": "Stremio Recommender",
+          "href": "guides/apps/stremio-recommender/index.html",
+          "description": "AI-powered personalized recommendations for Stremio",
+          "children": [
+            { "label": "Overview", "href": "guides/apps/stremio-recommender/index.html" },
+            { "label": "Daily Use", "href": "guides/apps/stremio-recommender/daily-use.html" },
+            { "label": "Dashboard", "href": "guides/apps/stremio-recommender/dashboard.html" },
+            { "label": "Managing Recommendations", "href": "guides/apps/stremio-recommender/managing.html" },
+            { "label": "Troubleshooting", "href": "guides/apps/stremio-recommender/troubleshooting.html" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "github",
+      "label": "GitHub",
+      "icon": "git-branch",
+      "color": "#8b7aaa",
+      "children": [
+        {
+          "id": "ssh-setup",
+          "label": "GitHub SSH Setup",
+          "href": "guides/github/ssh-setup/index.html",
+          "description": "Setting up SSH keys for multiple GitHub accounts"
+        },
+        {
+          "id": "vscode-github-setup",
+          "label": "VS Code GitHub Setup",
+          "href": "guides/github/vscode-github-setup/index.html",
+          "description": "Configuring VS Code to push and pull from multiple GitHub accounts"
+        }
+      ]
+    },
+    {
+      "id": "linux",
+      "label": "Linux Help",
+      "icon": "terminal",
+      "color": "#9a6a8a",
+      "children": [
+        {
+          "id": "quickemu-windows",
+          "label": "Quickemu Windows VM",
+          "href": "guides/linux/quickemu-windows/index.html",
+          "description": "Setting up a Windows 11 VM using Quickemu"
+        },
+        {
+          "id": "claude-code",
+          "label": "Claude Code for Linux",
+          "href": "guides/linux/claude-code/index.html",
+          "description": "Installing and using Claude Code on Linux",
+          "children": [
+            { "label": "Overview", "href": "guides/linux/claude-code/index.html" },
+            { "label": "Installation", "href": "guides/linux/claude-code/installation.html" },
+            { "label": "Usage", "href": "guides/linux/claude-code/usage.html" },
+            { "label": "Project Memory", "href": "guides/linux/claude-code/project-memory.html" },
+            { "label": "Prompting", "href": "guides/linux/claude-code/prompting.html" },
+            { "label": "Advanced", "href": "guides/linux/claude-code/advanced.html" },
+            { "label": "Troubleshooting", "href": "guides/linux/claude-code/troubleshooting.html" }
+          ]
+        },
+        {
+          "id": "app-shortcuts",
+          "label": "App Menu Shortcuts",
+          "href": "guides/linux/app-shortcuts/index.html",
+          "description": "Create launcher shortcuts for local HTML applications",
+          "children": [
+            { "label": "Overview", "href": "guides/linux/app-shortcuts/index.html" },
+            { "label": "Choosing an Icon", "href": "guides/linux/app-shortcuts/icons.html" },
+            { "label": "Troubleshooting", "href": "guides/linux/app-shortcuts/troubleshooting.html" }
+          ]
+        },
+        {
+          "id": "portable-app-shortcuts",
+          "label": "Portable App Shortcuts",
+          "href": "guides/linux/portable-app-shortcuts/index.html",
+          "description": "Add AppImages, tarballs, and portable binaries to the app menu",
+          "children": [
+            { "label": "Overview", "href": "guides/linux/portable-app-shortcuts/index.html" },
+            { "label": "AppImages", "href": "guides/linux/portable-app-shortcuts/appimages.html" },
+            { "label": "Tarballs", "href": "guides/linux/portable-app-shortcuts/tarballs.html" },
+            { "label": "Icons", "href": "guides/linux/portable-app-shortcuts/icons.html" },
+            { "label": "Troubleshooting", "href": "guides/linux/portable-app-shortcuts/troubleshooting.html" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "my-apps",
+      "label": "My Apps",
+      "icon": "download",
+      "color": "#3d7a7a",
+      "children": [
+        {
+          "id": "site-sync",
+          "label": "Site Sync",
+          "href": "guides/my-apps/site-sync/index.html",
+          "description": "GUI tool for pulling GitHub repos to your local machine"
+        }
+      ]
+    },
+    {
+      "id": "webdev",
+      "label": "Web Dev",
+      "icon": "code",
+      "color": "#6a9a8a",
+      "children": [
+        {
+          "id": "creating-guides",
+          "label": "Creating New Guides",
+          "href": "guides/webdev/creating-guides/index.html",
+          "description": "How to use AI to create new pages for this site"
+        },
+        {
+          "id": "css-cheat-sheet",
+          "label": "CSS Cheat Sheet",
+          "href": "guides/webdev/css-cheat-sheet/index.html",
+          "description": "Quick reference guide to CSS selectors, properties, and patterns"
+        },
+        {
+          "id": "vibe-coding",
+          "label": "Vibe Coding with Claude Code",
+          "href": "guides/webdev/vibe-coding/index.html",
+          "description": "Natural-language-driven development in VS Code",
+          "children": [
+            { "label": "Overview", "href": "guides/webdev/vibe-coding/index.html" },
+            { "label": "Setup", "href": "guides/webdev/vibe-coding/setup.html" },
+            { "label": "Usage", "href": "guides/webdev/vibe-coding/usage.html" },
+            { "label": "Tips", "href": "guides/webdev/vibe-coding/tips.html" },
+            { "label": "Troubleshooting", "href": "guides/webdev/vibe-coding/troubleshooting.html" }
+          ]
+        }
+      ]
+    }
+  ]
+}
