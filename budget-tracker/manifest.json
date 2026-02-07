@@ -2,10 +2,11 @@
   "name": "Budget Tracker",
   "short_name": "Budget",
   "description": "Simple budget tracking app",
-  "start_url": "/apps/budget-tracker/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#f3f4f6",
-  "theme_color": "#2563eb",
+  "background_color": "#0f0f12",
+  "theme_color": "#0f0f12",
   "orientation": "portrait",
   "icons": [
     {

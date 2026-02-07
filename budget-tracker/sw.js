@@ -2,7 +2,7 @@
  * Service Worker - Offline support for Budget Tracker PWA
  */
 
-const CACHE_NAME = 'budget-tracker-v30';
+const CACHE_NAME = 'budget-tracker-v31';
 
 const STATIC_ASSETS = [
     './',
