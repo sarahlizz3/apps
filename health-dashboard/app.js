@@ -662,6 +662,9 @@ async function saveDiagnosis() {
 
 function buildProviderForm(existing) {
   const e = existing || {};
+  const defaultExplainers = e.defaultExplainers || [];
+  const defaultColumns = e.defaultColumns || MED_COLUMNS.filter(c => !c.alwaysShow).map(c => c.key); // all optional columns on by default for new providers
+
   return `
     <label class="field-label">Provider Name *</label>
     <input type="text" id="form-prov-name" class="input-field" value="${esc(e.name || "")}" placeholder="e.g., Dr. Smith or PCP / PA">
@@ -681,6 +684,28 @@ function buildProviderForm(existing) {
     <label class="field-label">Concern Tags (auto-maps which items this provider sees)</label>
     ${buildConcernTagsHTML(e.concernTags)}
 
+    <label class="field-label">Default Medication Columns for Printout</label>
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.3rem;">Medication name, dose, and purpose always show. Select which additional columns to include by default.</p>
+    <div class="checkbox-group" id="form-prov-default-columns">
+      ${MED_COLUMNS.filter(c => !c.alwaysShow).map(c => `
+        <label class="checkbox-chip ${defaultColumns.includes(c.key) ? 'selected' : ''}">
+          <input type="checkbox" value="${c.key}" ${defaultColumns.includes(c.key) ? 'checked' : ''}>
+          ${c.label}
+        </label>
+      `).join("")}
+    </div>
+
+    <label class="field-label">Default Explainer Blocks for Printout</label>
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.3rem;">Select which explainer blocks should be included by default when printing for this provider. You can still toggle these before each printout.</p>
+    <div class="checkbox-group" id="form-prov-default-explainers">
+      ${appData.explainers.map(exp => `
+        <label class="checkbox-chip ${defaultExplainers.includes(exp.id) ? 'selected' : ''}">
+          <input type="checkbox" value="${exp.id}" ${defaultExplainers.includes(exp.id) ? 'checked' : ''}>
+          ${esc(exp.title)}
+        </label>
+      `).join("")}
+    </div>
+
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveProvider()">Save</button>
@@ -699,6 +724,8 @@ async function saveProvider() {
     visitNotes: document.getElementById("form-prov-visitnotes").value.trim(),
     notes: document.getElementById("form-prov-notes").value.trim(),
     concernTags: getSelectedCheckboxes("form-concern-tags"),
+    defaultColumns: getSelectedCheckboxes("form-prov-default-columns"),
+    defaultExplainers: getSelectedCheckboxes("form-prov-default-explainers"),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
@@ -794,17 +821,44 @@ function refreshPrintOptions() {
   // Provider select
   const sel = document.getElementById("print-provider-select");
   if (sel) {
+    const currentVal = sel.value;
     sel.innerHTML = appData.providers.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
+    if (currentVal && appData.providers.some(p => p.id === currentVal)) {
+      sel.value = currentVal;
+    }
+    // Remove old listener to avoid duplicates, then add new one
+    sel.removeEventListener("change", onPrintProviderChange);
+    sel.addEventListener("change", onPrintProviderChange);
   }
+
+  // Load defaults for currently selected provider
+  loadPrintDefaults();
+}
+
+function onPrintProviderChange() {
+  loadPrintDefaults();
+}
+
+function loadPrintDefaults() {
+  const sel = document.getElementById("print-provider-select");
+  if (!sel) return;
+  const provider = appData.providers.find(p => p.id === sel.value);
+  if (!provider) return;
+
+  const defaultColumns = provider.defaultColumns || MED_COLUMNS.filter(c => !c.alwaysShow).map(c => c.key);
+  const defaultExplainers = provider.defaultExplainers || [];
 
   // Column toggles
   const colToggle = document.getElementById("print-columns-toggle");
   if (colToggle) {
-    colToggle.innerHTML = MED_COLUMNS.filter(c => !c.alwaysShow).map(c => `
-      <label class="toggle-chip active">
-        <input type="checkbox" value="${c.key}" checked> ${c.label}
-      </label>
-    `).join("");
+    colToggle.innerHTML = MED_COLUMNS.filter(c => !c.alwaysShow).map(c => {
+      const isOn = defaultColumns.includes(c.key);
+      return `
+        <label class="toggle-chip ${isOn ? 'active' : ''}">
+          <input type="checkbox" value="${c.key}" ${isOn ? 'checked' : ''}> ${c.label}
+        </label>
+      `;
+    }).join("");
     colToggle.querySelectorAll(".toggle-chip").forEach(chip => {
       chip.addEventListener("click", () => {
         const cb = chip.querySelector("input");
@@ -817,11 +871,14 @@ function refreshPrintOptions() {
   // Explainer toggles
   const expToggle = document.getElementById("print-explainers-toggle");
   if (expToggle) {
-    expToggle.innerHTML = appData.explainers.map(e => `
-      <label class="toggle-chip">
-        <input type="checkbox" value="${e.id}"> ${esc(e.title)}
-      </label>
-    `).join("");
+    expToggle.innerHTML = appData.explainers.map(e => {
+      const isOn = defaultExplainers.includes(e.id);
+      return `
+        <label class="toggle-chip ${isOn ? 'active' : ''}">
+          <input type="checkbox" value="${e.id}" ${isOn ? 'checked' : ''}> ${esc(e.title)}
+        </label>
+      `;
+    }).join("");
     expToggle.querySelectorAll(".toggle-chip").forEach(chip => {
       chip.addEventListener("click", () => {
         const cb = chip.querySelector("input");
