@@ -135,6 +135,7 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
     document.getElementById("section-" + btn.dataset.section).classList.add("active");
     if (btn.dataset.section === "print") refreshPrintOptions();
     if (btn.dataset.section === "notes") refreshNotesProviderSelect();
+    if (btn.dataset.section === "forminfo") renderFormInfo();
   });
 });
 
@@ -164,6 +165,7 @@ function renderAll() {
   renderProviders();
   renderExplainers();
   renderNotes();
+  renderFormInfo();
   refreshPrintOptions();
 }
 
@@ -255,6 +257,8 @@ function renderProviders() {
       <div class="item-info">
         <div class="item-name">${esc(p.name)}</div>
         <div class="item-detail"><strong>Role:</strong> ${esc(p.role || "—")}</div>
+        ${p.practice ? `<div class="item-detail"><strong>Practice:</strong> ${esc(p.practice)}</div>` : ""}
+        ${p.phone ? `<div class="item-detail"><strong>Phone:</strong> ${esc(p.phone)}</div>` : ""}
         ${p.notes ? `<div class="item-detail"><strong>Notes:</strong> ${esc(p.notes)}</div>` : ""}
         <div class="item-tags">
           ${(p.concernTags || []).map(t => `<span class="tag">${esc(t)}</span>`).join("")}
@@ -473,6 +477,15 @@ function openModal(type, editId = null) {
   } else if (type === "explainer") {
     title.textContent = editId ? "Edit Explainer Block" : "Add Explainer Block";
     body.innerHTML = buildExplainerForm(existing);
+  } else if (type === "patientinfo") {
+    title.textContent = "Edit Patient Info";
+    loadPatientInfo().then(info => {
+      body.innerHTML = buildPatientInfoForm(info);
+      initCheckboxChips();
+    });
+    body.innerHTML = '<p style="padding:1rem;color:var(--text-muted);">Loading...</p>';
+    overlay.classList.add("visible");
+    return;
   }
 
   overlay.classList.add("visible");
@@ -672,6 +685,18 @@ function buildProviderForm(existing) {
     <label class="field-label">Role / Specialty</label>
     <input type="text" id="form-prov-role" class="input-field" value="${esc(e.role || "")}" placeholder="e.g., Psychiatrist, Bariatric Surgeon">
 
+    <label class="field-label">Practice Name</label>
+    <input type="text" id="form-prov-practice" class="input-field" value="${esc(e.practice || "")}" placeholder="e.g., Macomb Psychology Associates">
+
+    <label class="field-label">Address</label>
+    <input type="text" id="form-prov-address" class="input-field" value="${esc(e.address || "")}" placeholder="e.g., 123 Main St, Suite 200, Shelby Twp, MI 48316">
+
+    <label class="field-label">Phone</label>
+    <input type="tel" id="form-prov-phone" class="input-field" value="${esc(e.phone || "")}" placeholder="e.g., (586) 555-1234">
+
+    <label class="field-label">Fax</label>
+    <input type="tel" id="form-prov-fax" class="input-field" value="${esc(e.fax || "")}" placeholder="e.g., (586) 555-5678">
+
     <label class="field-label">Executive Summary (for printouts)</label>
     <textarea id="form-prov-summary" class="input-field textarea-large" rows="5" placeholder="Paste a per-provider executive summary here...">${esc(e.executiveSummary || "")}</textarea>
 
@@ -720,6 +745,10 @@ async function saveProvider() {
   const data = {
     name,
     role: document.getElementById("form-prov-role").value.trim(),
+    practice: document.getElementById("form-prov-practice").value.trim(),
+    address: document.getElementById("form-prov-address").value.trim(),
+    phone: document.getElementById("form-prov-phone").value.trim(),
+    fax: document.getElementById("form-prov-fax").value.trim(),
     executiveSummary: document.getElementById("form-prov-summary").value.trim(),
     visitNotes: document.getElementById("form-prov-visitnotes").value.trim(),
     notes: document.getElementById("form-prov-notes").value.trim(),
@@ -1096,6 +1125,223 @@ Please organize your findings by urgency: (1) Address soon, (2) Bring up at next
   const filename = `health_export_${new Date().toISOString().slice(0, 10)}.md`;
   downloadFile(filename, md, "text/markdown");
   showToast("Export generated!");
+}
+
+// =============================================
+// FORM INFO SCREEN
+// =============================================
+function renderFormInfo() {
+  renderFormInfoPatient();
+  renderFormInfoMeds();
+  renderFormInfoSurgeries();
+  renderFormInfoAllergies();
+  renderFormInfoDiagnoses();
+  renderFormInfoProviders();
+}
+
+async function loadPatientInfo() {
+  try {
+    const doc = await userDoc().get();
+    return doc.exists ? (doc.data().patientInfo || {}) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+async function renderFormInfoPatient() {
+  const info = await loadPatientInfo();
+  const container = document.getElementById("forminfo-patient");
+  if (!container) return;
+
+  const fields = [
+    ["Name", info.fullName],
+    ["DOB", info.dob],
+    ["Phone", info.phone],
+    ["Email", info.email],
+    ["Address", info.address],
+    ["Emergency", info.emergencyContact],
+    ["Insurance", info.insurance],
+    ["Member ID", info.memberId],
+    ["Group #", info.groupNumber],
+    ["Pharmacy", info.pharmacy]
+  ];
+
+  container.innerHTML = fields
+    .filter(([, val]) => val)
+    .map(([label, val]) => `
+      <div class="forminfo-row" onclick="copyToClipboard('${esc(val)}')">
+        <span class="forminfo-label">${label}</span>
+        <span class="forminfo-value">${esc(val)}</span>
+      </div>
+    `).join("") || '<p style="color:var(--text-muted);font-size:0.88rem;">No patient info yet. Click "Edit Patient Info" to add.</p>';
+}
+
+function renderFormInfoMeds() {
+  const container = document.getElementById("forminfo-meds");
+  if (!container) return;
+  const meds = appData.medications.filter(m => m.duration === "ongoing");
+  container.innerHTML = meds.map(m => `
+    <div class="forminfo-list-item" onclick="copyToClipboard('${esc(m.name)} ${esc(m.dose)}')">
+      <strong>${esc(m.name)}</strong> — ${esc(m.dose || "no dose listed")}
+      <span class="sub">${esc(m.purpose || "")}</span>
+    </div>
+  `).join("") || '<p style="color:var(--text-muted);font-size:0.88rem;">No ongoing medications.</p>';
+}
+
+function renderFormInfoSurgeries() {
+  const container = document.getElementById("forminfo-surgeries");
+  if (!container) return;
+  // Pull from the "Surgical History" explainer block if it exists
+  const surgeryExplainer = appData.explainers.find(e => e.title.toLowerCase().includes("surgical history"));
+  if (surgeryExplainer) {
+    // Parse the comma-separated surgeries
+    const surgeries = surgeryExplainer.content.split(",").map(s => s.trim()).filter(Boolean);
+    container.innerHTML = surgeries.map(s => `
+      <div class="forminfo-list-item" onclick="copyToClipboard('${esc(s)}')">${esc(s)}</div>
+    `).join("");
+  } else {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;">No surgical history found. Add a "Surgical History" explainer block.</p>';
+  }
+}
+
+function renderFormInfoAllergies() {
+  const container = document.getElementById("forminfo-allergies");
+  if (!container) return;
+  const allergyExplainer = appData.explainers.find(e => e.title.toLowerCase().includes("allergies"));
+  if (allergyExplainer) {
+    container.innerHTML = `<div class="forminfo-list-item" onclick="copyToClipboard('${esc(allergyExplainer.content)}')">${esc(allergyExplainer.content)}</div>`;
+  } else {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;">No allergies found. Add an "Allergies" explainer block.</p>';
+  }
+}
+
+function renderFormInfoDiagnoses() {
+  const container = document.getElementById("forminfo-diagnoses");
+  if (!container) return;
+  const diags = appData.diagnoses.filter(d => d.status !== "Resolved");
+  container.innerHTML = diags.map(d => `
+    <div class="forminfo-list-item" onclick="copyToClipboard('${esc(d.name)}')">
+      <strong>${esc(d.name)}</strong>
+      <span class="sub">${esc(d.status || "")} ${d.diagnosedDate ? "— " + esc(d.diagnosedDate) : ""}</span>
+    </div>
+  `).join("") || '<p style="color:var(--text-muted);font-size:0.88rem;">No active diagnoses.</p>';
+}
+
+function renderFormInfoProviders() {
+  const container = document.getElementById("forminfo-providers");
+  if (!container) return;
+  container.innerHTML = appData.providers.map(p => `
+    <div class="forminfo-provider-card">
+      <h4>${esc(p.name)}</h4>
+      ${p.role ? `<div class="forminfo-row" onclick="copyToClipboard('${esc(p.role)}')"><span class="forminfo-label">Role</span><span class="forminfo-value">${esc(p.role)}</span></div>` : ""}
+      ${p.practice ? `<div class="forminfo-row" onclick="copyToClipboard('${esc(p.practice)}')"><span class="forminfo-label">Practice</span><span class="forminfo-value">${esc(p.practice)}</span></div>` : ""}
+      ${p.address ? `<div class="forminfo-row" onclick="copyToClipboard('${esc(p.address)}')"><span class="forminfo-label">Address</span><span class="forminfo-value">${esc(p.address)}</span></div>` : ""}
+      ${p.phone ? `<div class="forminfo-row" onclick="copyToClipboard('${esc(p.phone)}')"><span class="forminfo-label">Phone</span><span class="forminfo-value">${esc(p.phone)}</span></div>` : ""}
+      ${p.fax ? `<div class="forminfo-row" onclick="copyToClipboard('${esc(p.fax)}')"><span class="forminfo-label">Fax</span><span class="forminfo-value">${esc(p.fax)}</span></div>` : ""}
+    </div>
+  `).join("") || '<p style="color:var(--text-muted);font-size:0.88rem;">No providers added yet.</p>';
+}
+
+// =============================================
+// PATIENT INFO MODAL
+// =============================================
+function buildPatientInfoForm(existing) {
+  const e = existing || {};
+  return `
+    <label class="field-label">Full Name</label>
+    <input type="text" id="form-pi-name" class="input-field" value="${esc(e.fullName || "")}" placeholder="e.g., Sarah Karlis">
+
+    <label class="field-label">Date of Birth</label>
+    <input type="text" id="form-pi-dob" class="input-field" value="${esc(e.dob || "")}" placeholder="e.g., 05/06/1979">
+
+    <label class="field-label">Phone</label>
+    <input type="tel" id="form-pi-phone" class="input-field" value="${esc(e.phone || "")}" placeholder="e.g., (586) 555-0000">
+
+    <label class="field-label">Email</label>
+    <input type="email" id="form-pi-email" class="input-field" value="${esc(e.email || "")}" placeholder="e.g., sarah@email.com">
+
+    <label class="field-label">Address</label>
+    <input type="text" id="form-pi-address" class="input-field" value="${esc(e.address || "")}" placeholder="Full mailing address">
+
+    <label class="field-label">Emergency Contact</label>
+    <input type="text" id="form-pi-emergency" class="input-field" value="${esc(e.emergencyContact || "")}" placeholder="e.g., John Doe — (586) 555-1234 — Spouse">
+
+    <label class="field-label">Insurance Provider</label>
+    <input type="text" id="form-pi-insurance" class="input-field" value="${esc(e.insurance || "")}" placeholder="e.g., Blue Cross Blue Shield">
+
+    <label class="field-label">Member ID</label>
+    <input type="text" id="form-pi-memberid" class="input-field" value="${esc(e.memberId || "")}" placeholder="Insurance member ID">
+
+    <label class="field-label">Group Number</label>
+    <input type="text" id="form-pi-group" class="input-field" value="${esc(e.groupNumber || "")}" placeholder="Insurance group number">
+
+    <label class="field-label">Pharmacy</label>
+    <input type="text" id="form-pi-pharmacy" class="input-field" value="${esc(e.pharmacy || "")}" placeholder="e.g., CVS — 123 Main St — (586) 555-9999">
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePatientInfo()">Save</button>
+    </div>
+  `;
+}
+
+async function savePatientInfo() {
+  const data = {
+    fullName: document.getElementById("form-pi-name").value.trim(),
+    dob: document.getElementById("form-pi-dob").value.trim(),
+    phone: document.getElementById("form-pi-phone").value.trim(),
+    email: document.getElementById("form-pi-email").value.trim(),
+    address: document.getElementById("form-pi-address").value.trim(),
+    emergencyContact: document.getElementById("form-pi-emergency").value.trim(),
+    insurance: document.getElementById("form-pi-insurance").value.trim(),
+    memberId: document.getElementById("form-pi-memberid").value.trim(),
+    groupNumber: document.getElementById("form-pi-group").value.trim(),
+    pharmacy: document.getElementById("form-pi-pharmacy").value.trim()
+  };
+
+  try {
+    await userDoc().set({ patientInfo: data }, { merge: true });
+    showToast("Patient info saved!");
+    renderFormInfoPatient();
+    closeModal();
+  } catch (err) {
+    showToast("Error saving: " + err.message, true);
+  }
+}
+
+// =============================================
+// COPY TO CLIPBOARD
+// =============================================
+function copyToClipboard(text) {
+  // Unescape HTML entities
+  const el = document.createElement("textarea");
+  el.innerHTML = text;
+  const cleanText = el.value;
+
+  navigator.clipboard.writeText(cleanText).then(() => {
+    // Show copied feedback
+    const toast = document.createElement("div");
+    toast.className = "copied-toast";
+    toast.textContent = "Copied!";
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 1000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement("textarea");
+    ta.value = cleanText;
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+
+    const toast = document.createElement("div");
+    toast.className = "copied-toast";
+    toast.textContent = "Copied!";
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 1000);
+  });
 }
 
 // =============================================

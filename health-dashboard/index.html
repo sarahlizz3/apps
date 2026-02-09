@@ -39,6 +39,7 @@
       <button class="nav-btn" data-section="providers">Providers</button>
       <button class="nav-btn" data-section="explainers">Explainer Blocks</button>
       <button class="nav-btn" data-section="notes">Appointment Notes</button>
+      <button class="nav-btn" data-section="forminfo">📋 Form Info</button>
       <button class="nav-btn" data-section="print">Print / Export</button>
     </nav>
 
@@ -109,6 +110,53 @@
             </div>
           </div>
           <div id="notes-list" class="notes-feed"></div>
+        </div>
+      </section>
+
+      <!-- FORM INFO SECTION -->
+      <section id="section-forminfo" class="section">
+        <div class="section-header">
+          <h2>📋 Form Info</h2>
+          <p class="section-description" style="margin:0;">Quick-reference for filling out paperwork. Tap any field to copy.</p>
+        </div>
+
+        <div class="forminfo-grid">
+          <!-- Patient Info -->
+          <div class="forminfo-card">
+            <h3>Patient Information</h3>
+            <div id="forminfo-patient" class="forminfo-fields"></div>
+            <button class="btn btn-ghost btn-small" style="margin-top:0.75rem;" onclick="openModal('patientinfo')">Edit Patient Info</button>
+          </div>
+
+          <!-- Current Medications -->
+          <div class="forminfo-card">
+            <h3>Current Medications</h3>
+            <div id="forminfo-meds" class="forminfo-list"></div>
+          </div>
+
+          <!-- Surgeries -->
+          <div class="forminfo-card">
+            <h3>Surgeries / Procedures</h3>
+            <div id="forminfo-surgeries" class="forminfo-list"></div>
+          </div>
+
+          <!-- Allergies -->
+          <div class="forminfo-card">
+            <h3>Allergies</h3>
+            <div id="forminfo-allergies" class="forminfo-list"></div>
+          </div>
+
+          <!-- Diagnoses -->
+          <div class="forminfo-card">
+            <h3>Diagnoses</h3>
+            <div id="forminfo-diagnoses" class="forminfo-list"></div>
+          </div>
+
+          <!-- Providers -->
+          <div class="forminfo-card forminfo-card-wide">
+            <h3>Providers</h3>
+            <div id="forminfo-providers" class="forminfo-providers-grid"></div>
+          </div>
         </div>
       </section>
 
