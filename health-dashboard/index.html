@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Auth Screen -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-container">
+      <h1 class="auth-title">Health Dashboard</h1>
+      <p class="auth-subtitle">Personal health record management</p>
+      <button id="sign-in-btn" class="btn btn-primary btn-large">Sign in with Google</button>
+      <p class="auth-note">Your data is stored securely in Firebase and accessible only to you.</p>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app-screen" class="screen">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <h1 class="app-title">Health Dashboard</h1>
+      </div>
+      <div class="top-bar-right">
+        <span id="user-email" class="user-email"></span>
+        <button id="sign-out-btn" class="btn btn-ghost btn-small">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+      <button class="nav-btn active" data-section="medications">Medications</button>
+      <button class="nav-btn" data-section="diagnoses">Diagnoses</button>
+      <button class="nav-btn" data-section="providers">Providers</button>
+      <button class="nav-btn" data-section="explainers">Explainer Blocks</button>
+      <button class="nav-btn" data-section="notes">Appointment Notes</button>
+      <button class="nav-btn" data-section="print">Print / Export</button>
+    </nav>
+
+    <!-- Content Sections -->
+    <main class="content">
+
+      <!-- MEDICATIONS SECTION -->
+      <section id="section-medications" class="section active">
+        <div class="section-header">
+          <h2>Medications</h2>
+          <button class="btn btn-primary" onclick="openModal('med')">+ Add Medication</button>
+        </div>
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="ongoing">Ongoing</button>
+          <button class="filter-btn" data-filter="temporary">Temporary</button>
+        </div>
+        <div id="medications-list" class="items-list"></div>
+      </section>
+
+      <!-- DIAGNOSES SECTION -->
+      <section id="section-diagnoses" class="section">
+        <div class="section-header">
+          <h2>Diagnoses</h2>
+          <button class="btn btn-primary" onclick="openModal('diagnosis')">+ Add Diagnosis</button>
+        </div>
+        <div id="diagnoses-list" class="items-list"></div>
+      </section>
+
+      <!-- PROVIDERS SECTION -->
+      <section id="section-providers" class="section">
+        <div class="section-header">
+          <h2>Providers</h2>
+          <button class="btn btn-primary" onclick="openModal('provider')">+ Add Provider</button>
+        </div>
+        <div id="providers-list" class="items-list"></div>
+      </section>
+
+      <!-- EXPLAINER BLOCKS SECTION -->
+      <section id="section-explainers" class="section">
+        <div class="section-header">
+          <h2>Explainer Blocks</h2>
+          <button class="btn btn-primary" onclick="openModal('explainer')">+ Add Explainer</button>
+        </div>
+        <p class="section-description">Long narrative explanations and short summary facts that can be toggled on/off per provider printout.</p>
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="long">Long / Narrative</button>
+          <button class="filter-btn" data-filter="short">Short / Summary</button>
+        </div>
+        <div id="explainers-list" class="items-list"></div>
+      </section>
+
+      <!-- APPOINTMENT NOTES SECTION -->
+      <section id="section-notes" class="section">
+        <div class="section-header">
+          <h2>Appointment Notes</h2>
+        </div>
+        <div class="notes-layout">
+          <div class="notes-sidebar">
+            <label class="field-label">Provider</label>
+            <select id="notes-provider-select" class="input-field input-large"></select>
+            <button class="btn btn-primary btn-large quick-note-btn" onclick="openQuickNote()">
+              + Quick Note
+            </button>
+            <div class="notes-search">
+              <input type="text" id="notes-search" class="input-field input-large" placeholder="Search notes...">
+            </div>
+          </div>
+          <div id="notes-list" class="notes-feed"></div>
+        </div>
+      </section>
+
+      <!-- PRINT / EXPORT SECTION -->
+      <section id="section-print" class="section">
+        <div class="section-header">
+          <h2>Print / Export</h2>
+        </div>
+
+        <div class="print-options">
+          <!-- Provider Printout -->
+          <div class="print-card">
+            <h3>Provider Printout</h3>
+            <p>Generate a filtered, print-ready document for a specific provider.</p>
+            <div class="print-controls">
+              <label class="field-label">Select Provider</label>
+              <select id="print-provider-select" class="input-field"></select>
+
+              <label class="field-label">Document Subtitle (optional)</label>
+              <input type="text" id="print-subtitle" class="input-field" placeholder="e.g., Updated Info, Pre-Visit Summary">
+
+              <label class="field-label">Include Columns for Medications</label>
+              <div id="print-columns-toggle" class="toggle-group"></div>
+
+              <label class="field-label">Include Explainer Blocks</label>
+              <div id="print-explainers-toggle" class="toggle-group"></div>
+
+              <label class="field-label">Include Executive Summary</label>
+              <div class="toggle-single">
+                <input type="checkbox" id="print-include-summary" checked>
+                <label for="print-include-summary">Include per-provider executive summary</label>
+              </div>
+
+              <label class="field-label">Include Visit Notes</label>
+              <div class="toggle-single">
+                <input type="checkbox" id="print-include-notes">
+                <label for="print-include-notes">Include "For next visit" notes</label>
+              </div>
+
+              <button class="btn btn-primary btn-large" onclick="generatePrintout()">Generate & Download Printout</button>
+            </div>
+          </div>
+
+          <!-- Claude Export -->
+          <div class="print-card">
+            <h3>Export for Claude Review</h3>
+            <p>Generate a Markdown file with all your health data and review instructions for Claude.</p>
+            <button class="btn btn-primary btn-large" onclick="generateClaudeExport()">Generate & Download Export</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL OVERLAY -->
+  <div id="modal-overlay" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- QUICK NOTE MODAL -->
+  <div id="quick-note-overlay" class="modal-overlay" onclick="closeQuickNoteOnOverlay(event)">
+    <div class="modal modal-quick-note">
+      <div class="modal-header">
+        <h3>Quick Note</h3>
+        <button class="modal-close" onclick="closeQuickNote()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label class="field-label">Provider</label>
+        <select id="quick-note-provider" class="input-field input-large"></select>
+        <label class="field-label">Note</label>
+        <textarea id="quick-note-text" class="input-field input-large textarea-large" placeholder="Type your note here..." rows="6"></textarea>
+        <div class="modal-actions">
+          <button class="btn btn-primary btn-large" onclick="saveQuickNote()">Save Note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRMATION -->
+  <div id="delete-overlay" class="modal-overlay">
+    <div class="modal modal-small">
+      <div class="modal-header">
+        <h3>Confirm Deletion</h3>
+      </div>
+      <div class="modal-body">
+        <p id="delete-message" class="delete-warning"></p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeDeleteConfirm()">Cancel</button>
+          <button class="btn btn-danger" id="delete-confirm-btn">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
