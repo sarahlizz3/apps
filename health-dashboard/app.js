@@ -1067,3 +1067,112 @@ function downloadFile(filename, content, mimeType) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+// =============================================
+// JSON EXPORT (BACKUP)
+// =============================================
+function exportJSON() {
+  // Strip Firestore-specific fields for clean export
+  function clean(items) {
+    return items.map(item => {
+      const copy = { ...item };
+      delete copy.id; // Firestore doc ID — will be regenerated on import
+      // Convert Firestore timestamps to ISO strings
+      if (copy.updatedAt && copy.updatedAt.seconds) {
+        copy.updatedAt = new Date(copy.updatedAt.seconds * 1000).toISOString();
+      }
+      if (copy.timestamp && copy.timestamp.seconds) {
+        copy.timestamp = new Date(copy.timestamp.seconds * 1000).toISOString();
+      }
+      return copy;
+    });
+  }
+
+  const exportData = {
+    exportDate: new Date().toISOString(),
+    appVersion: "1.0",
+    medications: clean(appData.medications),
+    diagnoses: clean(appData.diagnoses),
+    providers: clean(appData.providers),
+    explainers: clean(appData.explainers),
+    notes: clean(appData.notes)
+  };
+
+  const filename = `health_backup_${new Date().toISOString().slice(0, 10)}.json`;
+  downloadFile(filename, JSON.stringify(exportData, null, 2), "application/json");
+  showToast("JSON backup downloaded!");
+}
+
+// =============================================
+// JSON IMPORT
+// =============================================
+async function importJSON() {
+  let jsonText = "";
+
+  // Check for file upload first
+  const fileInput = document.getElementById("import-file");
+  const textInput = document.getElementById("import-json-text");
+
+  if (fileInput.files.length > 0) {
+    jsonText = await fileInput.files[0].text();
+  } else if (textInput.value.trim()) {
+    jsonText = textInput.value.trim();
+  } else {
+    return showToast("Please upload a JSON file or paste JSON data.", true);
+  }
+
+  let data;
+  try {
+    data = JSON.parse(jsonText);
+  } catch (e) {
+    return showToast("Invalid JSON: " + e.message, true);
+  }
+
+  // Validate structure
+  const validCollections = ["medications", "diagnoses", "providers", "explainers", "notes"];
+  const collectionsFound = validCollections.filter(c => Array.isArray(data[c]) && data[c].length > 0);
+
+  if (collectionsFound.length === 0) {
+    return showToast("No valid data found in JSON. Expected: medications, diagnoses, providers, explainers, or notes arrays.", true);
+  }
+
+  // Confirm before importing
+  const counts = collectionsFound.map(c => `${data[c].length} ${c}`).join(", ");
+  if (!confirm(`This will ADD the following to your existing data:\n\n${counts}\n\nThis does not overwrite existing items. Continue?`)) {
+    return;
+  }
+
+  let totalAdded = 0;
+
+  try {
+    for (const collName of collectionsFound) {
+      for (const item of data[collName]) {
+        // Remove any id field from imported data
+        const cleanItem = { ...item };
+        delete cleanItem.id;
+
+        // Convert date strings back to Firestore timestamps where needed
+        cleanItem.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+        if (collName === "notes" && cleanItem.timestamp) {
+          // Keep timestamp as a date for notes
+          cleanItem.timestamp = firebase.firestore.Timestamp.fromDate(new Date(cleanItem.timestamp));
+        }
+
+        await collection(collName).add(cleanItem);
+        totalAdded++;
+      }
+    }
+
+    showToast(`Import complete! Added ${totalAdded} items. Reloading...`);
+
+    // Clear inputs
+    fileInput.value = "";
+    textInput.value = "";
+
+    // Reload data
+    await loadAllData();
+
+  } catch (err) {
+    showToast(`Import error after ${totalAdded} items: ${err.message}`, true);
+  }
+}

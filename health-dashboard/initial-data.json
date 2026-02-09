@@ -1,0 +1,354 @@
+{
+  "exportDate": "2026-02-09T00:00:00.000Z",
+  "appVersion": "1.0",
+  "providers": [
+    {
+      "name": "Therapist",
+      "role": "Therapist",
+      "concernTags": ["Weight", "RLS", "Insomnia", "ADHD", "Anxiety", "Hormonal", "Post-surgical", "Sensory/ND"],
+      "executiveSummary": "",
+      "visitNotes": "",
+      "notes": "Long-term relationship; understands full AuDHD picture and autonomic dysregulation. ND herself (ADHD) with ADHD daughter. Most comprehensive understanding of full clinical picture."
+    },
+    {
+      "name": "Psychiatrist",
+      "role": "Psychiatrist",
+      "concernTags": ["Anxiety", "ADHD", "Insomnia", "Weight", "Hormonal", "RLS", "Sensory/ND"],
+      "executiveSummary": "",
+      "visitNotes": "Discuss transitioning from Zoloft to daily propranolol (immediate-release, BID or TID) for autonomic anxiety. Discuss Seroquel potentially worsening RLS.",
+      "notes": "Prescribes Zoloft, gabapentin, Seroquel, Vyvanse, Adderall. Has been resistant to acknowledging Zoloft-related weight gain."
+    },
+    {
+      "name": "PCP / PA",
+      "role": "Primary Care / Physician Assistant",
+      "concernTags": ["Weight", "RLS", "Iron", "ADHD", "Anxiety", "Hormonal", "Post-surgical", "Sensory/ND"],
+      "executiveSummary": "",
+      "visitNotes": "",
+      "notes": "Engaged with iron/RLS research; receptive to patient input. Read an RLS ferritin study on the spot and asked to keep it. Potentially the best candidate for coordinating across specialties."
+    },
+    {
+      "name": "OB/GYN NP",
+      "role": "OB/GYN Nurse Practitioner",
+      "concernTags": ["Hormonal", "ADHD", "Anxiety", "Sensory/ND"],
+      "executiveSummary": "",
+      "visitNotes": "",
+      "notes": "Long-term relationship; proactively researches patient concerns. Researched ADHD-hormone connection after patient raised it. Most engaged provider on hormonal component. Possibly ND herself."
+    },
+    {
+      "name": "Bariatric Surgeon",
+      "role": "Bariatric Surgeon",
+      "concernTags": ["Weight", "Post-surgical", "Iron"],
+      "executiveSummary": "",
+      "visitNotes": "Need someone to address medication-related weight gain as a weight management issue, regardless of who prescribed the medications.",
+      "notes": "Post-surgical follow-up. Switched practices due to medical trauma concerns with original surgical office. Has deflected weight-gain-from-medications conversations as 'not his specialty' despite being a weight management specialist."
+    },
+    {
+      "name": "Hematologist",
+      "role": "Hematologist",
+      "concernTags": ["Iron"],
+      "executiveSummary": "",
+      "visitNotes": "",
+      "notes": "Iron deficiency management; administers iron infusions."
+    }
+  ],
+  "medications": [
+    {
+      "name": "Vyvanse",
+      "dose": "40 mg daily",
+      "purpose": "ADHD",
+      "duration": "ongoing",
+      "startDate": "2020",
+      "dateApproximate": true,
+      "endDate": "",
+      "weightConcern": "No (appetite suppression)",
+      "rlsConcern": "",
+      "notes": "",
+      "concernTags": ["ADHD"],
+      "excludeProviders": []
+    },
+    {
+      "name": "Adderall",
+      "dose": "10 mg as needed (~1 week/month)",
+      "purpose": "ADHD symptom breakthrough during hormonal fluctuations",
+      "duration": "ongoing",
+      "startDate": "",
+      "dateApproximate": true,
+      "endDate": "",
+      "weightConcern": "No",
+      "rlsConcern": "",
+      "notes": "Supplemental to Vyvanse during premenstrual window when ADHD meds become less effective due to estrogen drop. See ADHD-Hormones explainer.",
+      "concernTags": ["ADHD", "Hormonal"],
+      "excludeProviders": []
+    },
+    {
+      "name": "Seroquel (quetiapine)",
+      "dose": "37.5 mg nightly (1.5 x 25 mg tablets)",
+      "purpose": "Insomnia",
+      "duration": "ongoing",
+      "startDate": "",
+      "dateApproximate": true,
+      "endDate": "",
+      "weightConcern": "Possible; may also worsen RLS",
+      "rlsConcern": "Antipsychotics (even at low doses) can worsen RLS — may be creating a cycle where gabapentin dose must increase to compensate",
+      "notes": "Effective for falling asleep. Potential conflict: may worsen the condition another medication (gabapentin) is treating.",
+      "concernTags": ["Insomnia", "RLS", "Weight"],
+      "excludeProviders": []
+    },
+    {
+      "name": "Gabapentin",
+      "dose": "900 mg (increased from 300 mg)",
+      "purpose": "Restless Leg Syndrome",
+      "duration": "ongoing",
+      "startDate": "Nov 2024 (300 mg); Jan 2026 (900 mg)",
+      "dateApproximate": false,
+      "endDate": "",
+      "weightConcern": "Yes — dose-dependent; risk increases with higher doses",
+      "rlsConcern": "",
+      "notes": "Significant dose increase (300 to 900 mg). Weight gain at higher doses is documented — average 5-10% body weight over time. Weight gain is generally reversible after discontinuation.",
+      "concernTags": ["RLS", "Weight"],
+      "excludeProviders": []
+    },
+    {
+      "name": "Zoloft (sertraline)",
+      "dose": "Tapering: currently 12.5 mg (from 100 mg)",
+      "purpose": "Anxiety",
+      "duration": "temporary",
+      "startDate": "Fall 2024",
+      "dateApproximate": true,
+      "endDate": "Tapering — target: discontinue",
+      "weightConcern": "Yes — gained 10-12 lbs. Patient predicted this before starting based on consistent personal history of psychotropic-related weight gain.",
+      "rlsConcern": "",
+      "notes": "Severe withdrawal symptoms when dropping from 25 mg to 0 mg (migraines 1+ week, major dizziness), requiring very slow taper through 12.5 mg. Patient's anxiety is primarily autonomic, not cognitive — SSRI may not be targeting the actual problem.",
+      "concernTags": ["Anxiety", "Weight"],
+      "excludeProviders": []
+    },
+    {
+      "name": "Ferrous sulfate",
+      "dose": "325 mg (65 mg absorbable) every other day + Vitamin C",
+      "purpose": "Iron deficiency",
+      "duration": "ongoing",
+      "startDate": "",
+      "dateApproximate": true,
+      "endDate": "",
+      "weightConcern": "",
+      "rlsConcern": "Iron supplementation supports RLS management — ferritin targets for RLS should be ≥75 µg/L per IRLSSG guidelines",
+      "notes": "",
+      "concernTags": ["Iron", "RLS"],
+      "excludeProviders": []
+    },
+    {
+      "name": "Bariatric Fusion Women's Multivitamin",
+      "dose": "Daily (contains 45 mg iron)",
+      "purpose": "Post-surgical supplementation",
+      "duration": "ongoing",
+      "startDate": "",
+      "dateApproximate": true,
+      "endDate": "",
+      "weightConcern": "",
+      "rlsConcern": "",
+      "notes": "Also helps manage intermittent vitamin D deficiency.",
+      "concernTags": ["Post-surgical", "Iron"],
+      "excludeProviders": []
+    },
+    {
+      "name": "Calcium chews",
+      "dose": "~1x daily (supplemented by dietary intake — cheese, yogurt, protein shake)",
+      "purpose": "Post-surgical supplementation",
+      "duration": "ongoing",
+      "startDate": "",
+      "dateApproximate": true,
+      "endDate": "",
+      "weightConcern": "",
+      "rlsConcern": "",
+      "notes": "",
+      "concernTags": ["Post-surgical"],
+      "excludeProviders": []
+    },
+    {
+      "name": "Mirena IUD",
+      "dose": "Hormonal IUD",
+      "purpose": "Contraception; eliminates periods",
+      "duration": "ongoing",
+      "startDate": "2021",
+      "dateApproximate": true,
+      "endDate": "",
+      "weightConcern": "",
+      "rlsConcern": "",
+      "notes": "No menstrual periods but patient still ovulates and experiences cyclical hormonal fluctuations trackable through ADHD symptom patterns and headaches.",
+      "concernTags": ["Hormonal"],
+      "excludeProviders": []
+    }
+  ],
+  "diagnoses": [
+    {
+      "name": "ADHD-Combined Type (Severe)",
+      "status": "Diagnosed",
+      "diagnosedDate": "2020 (age ~41)",
+      "notes": "Late diagnosis. Severity likely contributed to chronic emotional dysregulation misread as primary mood/anxiety disorders. Decades of compensatory strategies (weaponizing anxiety to manage ADHD) at significant physiological cost.",
+      "concernTags": ["ADHD"]
+    },
+    {
+      "name": "Autism Spectrum Disorder",
+      "status": "Suspected",
+      "diagnosedDate": "Recognized ~2024; not formally tested",
+      "notes": "Strongly suspected; clinically agreed upon by psychiatrist and therapist. Daughter (13) formally diagnosed AuDHD, which prompted patient's own recognition. Explains lifelong insomnia, sensory sensitivities, medication sensitivity pattern, and social/communication differences.",
+      "concernTags": ["Sensory/ND"]
+    },
+    {
+      "name": "Anxiety",
+      "status": "Suspected",
+      "diagnosedDate": "Undiagnosed formally; clinically agreed",
+      "notes": "Presentation is primarily autonomic/physiological, NOT cognitive. Nervous system chronically unable to downregulate. Therapist identifies this as the core issue. Has implications for medication selection — autonomic-targeting meds (propranolol) may be more appropriate than SSRIs.",
+      "concernTags": ["Anxiety"]
+    },
+    {
+      "name": "Restless Leg Syndrome (RLS)",
+      "status": "Diagnosed",
+      "diagnosedDate": "Medicated since Nov 2024; symptoms since mid-2000s",
+      "notes": "Significantly worsened 2023-2024. Ferritin targets should follow RLS-specific IRLSSG guidelines (≥75 µg/L), not standard reference ranges. Seroquel may be worsening symptoms.",
+      "concernTags": ["RLS"]
+    },
+    {
+      "name": "Chronic Insomnia",
+      "status": "Diagnosed",
+      "diagnosedDate": "Since at least age 8",
+      "notes": "Requires precise sensory conditions: white noise, pitch black, breathable cotton bedding, specific temperature. Consistent with autistic sensory regulation needs. Currently managed with Seroquel 37.5 mg.",
+      "concernTags": ["Insomnia", "Sensory/ND"]
+    },
+    {
+      "name": "Iron Deficiency",
+      "status": "Diagnosed",
+      "diagnosedDate": "Ongoing",
+      "notes": "Managed by hematologist with periodic infusions + oral supplementation. Iron absorption impaired post-gastric bypass. Relevant to RLS management.",
+      "concernTags": ["Iron", "RLS", "Post-surgical"]
+    },
+    {
+      "name": "Perimenopause",
+      "status": "Diagnosed",
+      "diagnosedDate": "Current",
+      "notes": "Introduces increasingly erratic estrogen fluctuations affecting ADHD symptom management, anxiety, insomnia, and emotional dysregulation. Compounds all other conditions.",
+      "concernTags": ["Hormonal", "ADHD", "Anxiety"]
+    },
+    {
+      "name": "GERD (History)",
+      "status": "Resolved",
+      "diagnosedDate": "Pre-2024",
+      "notes": "Largely resolved post-gastric bypass.",
+      "concernTags": ["Post-surgical"]
+    },
+    {
+      "name": "Tension Headaches",
+      "status": "Monitoring",
+      "diagnosedDate": "Recurring",
+      "notes": "Also experiences predictable cyclical headaches approximately 2 weeks after premenstrual ADHD symptom window (likely corresponds to ovulation/hormonal peaks).",
+      "concernTags": ["Hormonal"]
+    },
+    {
+      "name": "Joint Hypermobility",
+      "status": "Monitoring",
+      "diagnosedDate": "",
+      "notes": "Prone to joint injuries; at least somewhat hypermobile. Not sufficient for EDS diagnosis but relevant — hypermobility has significant comorbidity rates with autism and ADHD.",
+      "concernTags": ["Sensory/ND"]
+    },
+    {
+      "name": "Vitamin D Deficiency (Intermittent)",
+      "status": "Monitoring",
+      "diagnosedDate": "Ongoing",
+      "notes": "Michigan climate factor. Currently managed with multivitamin supplementation.",
+      "concernTags": ["Post-surgical"]
+    }
+  ],
+  "explainers": [
+    {
+      "title": "Autonomic Anxiety — Not Cognitive",
+      "type": "long",
+      "content": "This patient's anxiety is primarily autonomic/physiological, not cognitive. Her therapist has identified that her nervous system is chronically unable to downregulate. Her anxiety presentation is characterized by a chronically activated sympathetic nervous system that cannot return to baseline, consistent with documented patterns of elevated autonomic arousal in autistic individuals. Her nervous system operates near capacity at rest, meaning minimal additional stressors (sensory input, social demands, medical appointments) push her into sympathetic overdrive.\n\nThis is compounded by decades of using anxiety as a management tool for undiagnosed ADHD, and by the cumulative effects of AuDHD burnout — a cyclical pattern of nervous system depletion that does not resolve with standard rest because the baseline environmental demands exceed her neurological capacity.\n\nClinical implication: An SSRI (Zoloft) targets serotonergic pathways primarily relevant to mood and cognitive anxiety patterns. If the anxiety is primarily autonomic in origin, a medication that directly addresses sympathetic activation (such as propranolol) would more precisely target the presenting problem.",
+      "concernTags": ["Anxiety", "Sensory/ND"]
+    },
+    {
+      "title": "Medication Sensitivity — Autism Connection",
+      "type": "long",
+      "content": "This patient has a documented pattern of heightened sensitivity to medication effects — both therapeutic and adverse — across multiple drug classes. This is clinically consistent with autism. Published research supports that autistic individuals tend to be more sensitive to medication effects and more likely to experience adverse reactions. Clinical guidelines recommend starting at lower doses and titrating more slowly in this population (Springer/Neurotherapeutics, 2022).\n\nThe patient reports that positive effects also hit harder — she typically requires lower doses of analgesics and other medications for therapeutic effect. This pattern is also consistent with research on Sensory Processing Sensitivity (SPS), which links heightened environmental/sensory reactivity to heightened medication sensitivity via shared neurological mechanisms.\n\nSpecific history: Consistent weight gain on psychotropic medications (pattern predating current providers — this pattern led to the need for bariatric surgery). Severe withdrawal symptoms tapering Zoloft (migraines 1+ week, significant dizziness when dropping from 25 mg to 0 mg). Therapeutic effects at lower-than-standard doses for pain medications.",
+      "concernTags": ["Sensory/ND", "Weight"]
+    },
+    {
+      "title": "ADHD, Hormones, and Perimenopause",
+      "type": "long",
+      "content": "Research demonstrates that estrogen modulates dopamine activity in the prefrontal cortex. When estrogen drops (premenstrually, perimenopausally), dopaminergic function decreases, which directly worsens ADHD symptoms including executive dysfunction, emotional dysregulation, and focus.\n\nThis patient has a Mirena IUD (placed ~2021) and does not menstruate. However, she still ovulates and experiences hormonal fluctuations that she can reliably track through two markers: ADHD symptom breakthrough in the week before what would be her period, and predictable headaches approximately two weeks later (likely corresponding to ovulation/hormonal peaks). The absence of a visible period does not mean the absence of a hormonal cycle.\n\nShe currently takes Adderall 10 mg as needed during the premenstrual symptom window (~1 week/month) to supplement Vyvanse when it becomes less effective due to hormonal fluctuations.\n\nAs a perimenopausal woman with AuDHD, she faces compounding hormonal challenges. Perimenopause introduces increasingly erratic estrogen fluctuations, which can worsen ADHD symptoms, anxiety, insomnia, and emotional dysregulation unpredictably.",
+      "concernTags": ["ADHD", "Hormonal"]
+    },
+    {
+      "title": "AuDHD Context — Late Diagnosis",
+      "type": "long",
+      "content": "Patient went undiagnosed with ADHD until age 40-41 and autism remains formally untested (though clinically supported) due to well-documented patterns of underdiagnosis in women and girls, compounded by high intellectual ability (consistently testing in 95th-98th percentile) that masked functional impairment. Prior to ADHD diagnosis, she was repeatedly misdiagnosed with depression and anxiety. The diagnostic psychiatrist noted that the severity of her ADHD likely contributed to chronic emotional dysregulation that was being misread as primary mood/anxiety disorders.\n\nPatient has a successful career trajectory across multiple fields and holds an MA with full funding. This high achievement was sustained through compensatory strategies — primarily weaponizing anxiety to manage unmedicated ADHD — at significant physiological cost. She does not lack skills, motivation, or capacity. She lacks a nervous system that can sustain the output her brain is capable of.",
+      "concernTags": ["ADHD", "Sensory/ND", "Anxiety"]
+    },
+    {
+      "title": "Communication and Appointment Considerations",
+      "type": "long",
+      "content": "Patient has medical trauma that produces a trauma response during self-advocacy in medical settings. She frequently experiences visible emotional dysregulation (crying) during appointments, which is a physiological stress response and does not reflect her cognitive clarity or understanding of her own condition.\n\nPatient is twice-exceptional (2e): high cognitive ability combined with neurodevelopmental differences. She researches her conditions extensively using academic and clinical sources and can understand research findings at a high level. She may use lay terminology to express concepts she understands deeply — if she does not use precise clinical jargon, this should not be interpreted as lack of understanding.\n\nWritten communication is strongly preferred over verbal advocacy when possible. Patient benefits from providers who ask clarifying questions rather than making assumptions about what she is requesting.",
+      "concernTags": ["Sensory/ND"]
+    },
+    {
+      "title": "No Extended-Release Medications",
+      "type": "short",
+      "content": "Patient cannot take extended-release (ER) medications due to Roux-en-Y gastric bypass (May 2024). Altered GI anatomy makes ER absorption unpredictable. All medications must be immediate-release.",
+      "concernTags": ["Post-surgical"]
+    },
+    {
+      "title": "Medication Sensitivity — Start Low, Titrate Slow",
+      "type": "short",
+      "content": "Patient has a documented pattern of heightened medication sensitivity consistent with autism. Both therapeutic and adverse effects are amplified. Start at lower doses and titrate more slowly than standard protocols.",
+      "concernTags": ["Sensory/ND"]
+    },
+    {
+      "title": "Ferritin Targets for RLS",
+      "type": "short",
+      "content": "Ferritin targets should follow RLS-specific guidelines (IRLSSG recommends ≥75 µg/L), not standard reference ranges. Standard 'normal' ferritin levels are insufficient for RLS symptom management.",
+      "concernTags": ["RLS", "Iron"]
+    },
+    {
+      "title": "Weight Gain History — Psychotropic Medications",
+      "type": "short",
+      "content": "Patient has a consistent, documented history of weight gain on psychotropic medications with weight-gain side effect profiles. This pattern is what originally necessitated gastric bypass surgery. Medication-related weight gain should be actively monitored and treated as a clinical concern, not dismissed.",
+      "concernTags": ["Weight"]
+    },
+    {
+      "title": "Seroquel May Worsen RLS",
+      "type": "short",
+      "content": "Antipsychotics, even at low doses, can worsen restless leg syndrome. Current Seroquel use for insomnia may be aggravating RLS symptoms, potentially creating a cycle where gabapentin dose must be increased to compensate. This interaction should be evaluated.",
+      "concernTags": ["RLS", "Insomnia"]
+    },
+    {
+      "title": "Anxiety Is Autonomic, Not Cognitive",
+      "type": "short",
+      "content": "Patient's anxiety presentation is autonomic (nervous system stuck in fight-or-flight) rather than cognitive (rumination/catastrophizing). This has implications for medication selection — medications targeting sympathetic activation (e.g., propranolol) may be more appropriate than SSRIs.",
+      "concernTags": ["Anxiety"]
+    },
+    {
+      "title": "No Periods but Hormonal Cycle Persists",
+      "type": "short",
+      "content": "Patient has Mirena IUD and does not menstruate, but still ovulates and experiences cyclical hormonal fluctuations. She tracks her cycle through ADHD symptom breakthrough (~1 week premenstrually) and predictable headaches (~2 weeks later). Absence of periods ≠ absence of hormonal cycle.",
+      "concernTags": ["Hormonal", "ADHD"]
+    },
+    {
+      "title": "Surgical History",
+      "type": "short",
+      "content": "Roux-en-Y Gastric Bypass (May 2024), Laparoscopic Cholecystectomy (June 2012), Cesarean Section (June 2012).",
+      "concernTags": ["Post-surgical"]
+    },
+    {
+      "title": "Family History",
+      "type": "short",
+      "content": "Daughter (age 13): Diagnosed ADHD, autism, depression, anxiety. Mother: Anxiety, suspected undiagnosed autism. Father: High blood pressure, cataract surgery with intraocular lens implants.",
+      "concernTags": []
+    },
+    {
+      "title": "Allergies",
+      "type": "short",
+      "content": "Contact lens material sensitivity (specific breathable lens materials; ocular only). No known drug allergies, but significant medication sensitivity pattern — see Medication Sensitivity explainer.",
+      "concernTags": ["Sensory/ND"]
+    }
+  ],
+  "notes": []
+}

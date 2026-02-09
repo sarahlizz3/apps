@@ -159,6 +159,29 @@
             <button class="btn btn-primary btn-large" onclick="generateClaudeExport()">Generate & Download Export</button>
           </div>
         </div>
+
+        <div class="print-options" style="margin-top:1.25rem;">
+          <!-- JSON Backup -->
+          <div class="print-card">
+            <h3>Backup / Export JSON</h3>
+            <p>Download all your data as a JSON file for backup or transfer.</p>
+            <button class="btn btn-primary btn-large" onclick="exportJSON()">Download JSON Backup</button>
+          </div>
+
+          <!-- JSON Import -->
+          <div class="print-card">
+            <h3>Import Data</h3>
+            <p>Import data from a JSON backup file or paste JSON directly. This <strong>adds</strong> to your existing data (does not overwrite).</p>
+            <div class="print-controls">
+              <label class="field-label">Upload JSON file</label>
+              <input type="file" id="import-file" accept=".json" class="input-field">
+              <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin:0.25rem 0;">— or —</p>
+              <label class="field-label">Paste JSON</label>
+              <textarea id="import-json-text" class="input-field textarea-large" rows="5" placeholder="Paste JSON data here..."></textarea>
+              <button class="btn btn-primary btn-large" onclick="importJSON()">Import Data</button>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   </div>
