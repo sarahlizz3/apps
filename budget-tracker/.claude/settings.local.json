@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd Budget Tracker PWA with Firebase integration\n\nMobile-first budget tracking app featuring:\n- Quick expense entry with categories and subcategories\n- Summary view with monthly history and filtering\n- Charts \\(pie/bar\\) for spending visualization\n- Calendar glance view showing daily spending\n- Firebase authentication and Firestore data sync\n- Offline support via service worker\n- Dark mode UI with vibrant accent colors\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
