@@ -127,16 +127,62 @@ async function deleteItem(collectionName, id) {
 // =============================================
 // NAVIGATION
 // =============================================
-document.querySelectorAll(".nav-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    document.getElementById("section-" + btn.dataset.section).classList.add("active");
-    if (btn.dataset.section === "print") refreshPrintOptions();
-    if (btn.dataset.section === "notes") refreshNotesProviderSelect();
-    if (btn.dataset.section === "forminfo") renderFormInfo();
-  });
+// =============================================
+// NAVIGATION
+// =============================================
+function switchSection(sectionName) {
+  // Update all nav buttons everywhere (desktop + mobile)
+  document.querySelectorAll(".nav-btn, .nav-menu-item").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(`.nav-btn[data-section="${sectionName}"], .nav-menu-item[data-section="${sectionName}"]`).forEach(b => b.classList.add("active"));
+
+  // Update "More" button highlight if active section is in the dropdown
+  const moreBtn = document.getElementById("nav-more-btn");
+  if (moreBtn) {
+    const menuSections = Array.from(document.querySelectorAll(".nav-menu-item")).map(i => i.dataset.section);
+    moreBtn.classList.toggle("has-active", menuSections.includes(sectionName));
+  }
+
+  // Switch section
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.getElementById("section-" + sectionName)?.classList.add("active");
+
+  // Close dropdown
+  document.getElementById("nav-more-menu")?.classList.remove("open");
+
+  // Section-specific refreshes
+  if (sectionName === "print") refreshPrintOptions();
+  if (sectionName === "notes") refreshNotesProviderSelect();
+  if (sectionName === "forminfo") renderFormInfo();
+}
+
+// Desktop nav buttons
+document.querySelectorAll(".nav-desktop .nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchSection(btn.dataset.section));
+});
+
+// Mobile priority nav buttons
+document.querySelectorAll(".nav-mobile-priority > .nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchSection(btn.dataset.section));
+});
+
+// Mobile dropdown menu items
+document.querySelectorAll(".nav-menu-item").forEach(btn => {
+  btn.addEventListener("click", () => switchSection(btn.dataset.section));
+});
+
+// More button toggle
+document.getElementById("nav-more-btn")?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  document.getElementById("nav-more-menu")?.classList.toggle("open");
+});
+
+// Close dropdown when clicking outside
+document.addEventListener("click", (e) => {
+  const menu = document.getElementById("nav-more-menu");
+  const btn = document.getElementById("nav-more-btn");
+  if (menu && !menu.contains(e.target) && e.target !== btn) {
+    menu.classList.remove("open");
+  }
 });
 
 // =============================================

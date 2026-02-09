@@ -138,16 +138,23 @@ body {
    NAVIGATION
    ============================================ */
 .main-nav {
-  display: flex;
-  gap: 0;
   background: var(--bg-white);
   border-bottom: 1px solid var(--border);
-  padding: 0 1rem;
-  overflow-x: auto;
   position: sticky;
   top: var(--header-height);
   z-index: 99;
 }
+
+/* Desktop: show full bar, hide mobile priority */
+.nav-desktop {
+  display: flex;
+  gap: 0;
+  padding: 0 1rem;
+}
+.nav-mobile-priority {
+  display: none;
+}
+
 .nav-btn {
   padding: 0.85rem 1.15rem;
   font-size: 0.88rem;
@@ -166,6 +173,65 @@ body {
   color: var(--accent);
   border-bottom-color: var(--accent);
   font-weight: 600;
+}
+
+/* More dropdown wrapper */
+.nav-more-wrapper {
+  position: relative;
+}
+.nav-more-btn {
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: var(--font-main);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+}
+.nav-more-btn:hover { color: var(--text-primary); }
+.nav-more-btn.has-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.nav-more-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  min-width: 200px;
+  z-index: 200;
+  overflow: hidden;
+}
+.nav-more-menu.open {
+  display: flex;
+  flex-direction: column;
+}
+.nav-menu-item {
+  padding: 0.75rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.nav-menu-item:hover {
+  background: var(--bg-hover);
+}
+.nav-menu-item.active {
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--accent-light);
 }
 
 /* ============================================
@@ -749,17 +815,26 @@ select.input-field { cursor: pointer; }
   .user-email { display: none; }
   .app-title { font-size: 1rem; }
 
-  /* Nav — horizontally scrollable */
-  .main-nav {
+  /* Nav — swap to mobile priority view */
+  .nav-desktop { display: none; }
+  .nav-mobile-priority {
+    display: flex;
+    align-items: stretch;
     padding: 0;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
-  .main-nav::-webkit-scrollbar { display: none; }
-  .nav-btn {
-    padding: 0.7rem 0.75rem;
-    font-size: 0.78rem;
-    flex-shrink: 0;
+  .nav-mobile-priority .nav-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  .nav-more-btn {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.85rem;
+  }
+  .nav-more-menu {
+    right: 0;
+    left: auto;
   }
 
   /* Cards */
@@ -775,7 +850,6 @@ select.input-field { cursor: pointer; }
   .item-card { flex-direction: column; }
   .item-actions { align-self: flex-end; }
   .filter-bar { flex-wrap: wrap; }
-  .nav-btn { padding: 0.65rem 0.6rem; font-size: 0.74rem; }
   .forminfo-row { flex-direction: column; gap: 0.1rem; }
   .forminfo-label { min-width: unset; }
 }

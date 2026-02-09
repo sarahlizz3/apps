@@ -34,13 +34,29 @@
 
     <!-- Navigation -->
     <nav class="main-nav">
-      <button class="nav-btn active" data-section="medications">Medications</button>
-      <button class="nav-btn" data-section="diagnoses">Diagnoses</button>
-      <button class="nav-btn" data-section="providers">Providers</button>
-      <button class="nav-btn" data-section="explainers">Explainer Blocks</button>
-      <button class="nav-btn" data-section="notes">Appointment Notes</button>
-      <button class="nav-btn" data-section="forminfo">📋 Form Info</button>
-      <button class="nav-btn" data-section="print">Print / Export</button>
+      <div class="nav-mobile-priority">
+        <button class="nav-btn" data-section="notes">Appointment Notes</button>
+        <button class="nav-btn" data-section="forminfo">📋 Form Info</button>
+        <div class="nav-more-wrapper">
+          <button class="nav-more-btn" id="nav-more-btn">More ▾</button>
+          <div class="nav-more-menu" id="nav-more-menu">
+            <button class="nav-menu-item" data-section="medications">Medications</button>
+            <button class="nav-menu-item" data-section="diagnoses">Diagnoses</button>
+            <button class="nav-menu-item" data-section="providers">Providers</button>
+            <button class="nav-menu-item" data-section="explainers">Explainer Blocks</button>
+            <button class="nav-menu-item" data-section="print">Print / Export</button>
+          </div>
+        </div>
+      </div>
+      <div class="nav-desktop">
+        <button class="nav-btn active" data-section="medications">Medications</button>
+        <button class="nav-btn" data-section="diagnoses">Diagnoses</button>
+        <button class="nav-btn" data-section="providers">Providers</button>
+        <button class="nav-btn" data-section="explainers">Explainer Blocks</button>
+        <button class="nav-btn" data-section="notes">Appointment Notes</button>
+        <button class="nav-btn" data-section="forminfo">📋 Form Info</button>
+        <button class="nav-btn" data-section="print">Print / Export</button>
+      </div>
     </nav>
 
     <!-- Content Sections -->
