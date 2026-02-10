@@ -1,6 +1,6 @@
 {
-  "name": "Symptom Tracker",
-  "short_name": "Symptoms",
+  "name": "Flow Notes",
+  "short_name": "Flow",
   "icons": [
     {
       "src": "icon-192x192.png",
