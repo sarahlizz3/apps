@@ -143,11 +143,18 @@
           <div class="notes-grid" id="notes-grid">
             <!-- Note cards will be rendered here -->
           </div>
-          <button class="btn btn-add" id="add-note-btn">
-            <span class="btn-icon">+</span>
-            Add Note
-          </button>
         </div>
+        <button class="fab-add-note" id="add-note-btn" aria-label="Add note">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Note page -->
+            <rect x="5" y="3" width="16" height="20" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <!-- Fold corner -->
+            <path d="M15 3v4a2 2 0 002 2h4" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <!-- Plus sign -->
+            <line x1="13" y1="11" x2="13" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="9" y1="15" x2="17" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
       </section>
     </main>
 

@@ -12,6 +12,8 @@ const Notes = {
   searchInput: null,
   searchQuery: '',
   selectedTags: [],
+  _autosaveTimer: null,
+  _currentEditNote: null,
 
   // Tag color classes
   TAG_COLORS: ['tag-purple', 'tag-blue', 'tag-green', 'tag-cyan', 'tag-coral', 'tag-amber'],
@@ -262,8 +264,7 @@ const Notes = {
   showAddNoteModal() {
     this.showNoteModal({
       title: 'New Note',
-      note: null,
-      onSave: (data) => this.addNote(data)
+      note: null
     });
   },
 
@@ -271,12 +272,14 @@ const Notes = {
     this.showNoteModal({
       title: 'Edit Note',
       note,
-      onSave: (data) => this.updateNote(note, data),
       onDelete: () => this.confirmDeleteNote(note)
     });
   },
 
-  showNoteModal({ title, note, onSave, onDelete }) {
+  showNoteModal({ title, note, onDelete }) {
+    // Track the note being edited for autosave
+    this._currentEditNote = note;
+
     const content = document.createElement('div');
 
     // Title input
@@ -297,6 +300,12 @@ const Notes = {
       hint: 'Supports **bold**, *italic*, and `code` formatting'
     }));
 
+    // Autosave indicator
+    const autosaveIndicator = document.createElement('span');
+    autosaveIndicator.className = 'autosave-indicator';
+    autosaveIndicator.id = 'autosave-indicator';
+    content.querySelector('.form-group:nth-child(2) .hint').after(autosaveIndicator);
+
     // Tags input
     const tagsGroup = document.createElement('div');
     tagsGroup.className = 'form-group';
@@ -316,12 +325,13 @@ const Notes = {
 
     // Footer buttons
     const footer = document.createElement('div');
-    
+
     if (onDelete) {
       footer.appendChild(UI.createButton({
         text: 'Delete',
         className: 'btn btn-danger',
         onClick: () => {
+          this._clearAutosave();
           UI.closeModal();
           onDelete();
         }
@@ -329,38 +339,103 @@ const Notes = {
     }
 
     footer.appendChild(UI.createButton({
-      text: 'Cancel',
-      className: 'btn btn-secondary',
+      text: 'Done',
+      className: 'btn btn-primary',
       onClick: () => UI.closeModal()
     }));
 
-    footer.appendChild(UI.createButton({
-      text: 'Save',
-      className: 'btn btn-primary',
-      onClick: () => {
-        const titleInput = document.getElementById('note-title');
-        const bodyInput = document.getElementById('note-body');
-        const tagsContainer = document.getElementById('tags-input-container');
-        const tagElements = tagsContainer.querySelectorAll('.tag');
-        
-        const tags = Array.from(tagElements).map(el => el.dataset.tag);
-        
-        onSave({
-          title: titleInput.value.trim(),
-          body: bodyInput.value,
-          tags
-        });
-        
-        UI.closeModal();
+    UI.showModal({
+      title,
+      content,
+      footer,
+      onClose: () => {
+        // Flush any pending autosave when the modal closes (backdrop click, Escape, X button)
+        this._flushAutosave();
       }
-    }));
+    });
 
-    UI.showModal({ title, content, footer });
-
-    // Setup tags input after modal is shown
+    // Setup tags input and autosave listeners after modal is shown
     setTimeout(() => {
       this.setupTagsInput(currentTags);
+      this._setupAutosave();
     }, 100);
+  },
+
+  // ============================================
+  // Autosave
+  // ============================================
+
+  _setupAutosave() {
+    const titleInput = document.getElementById('note-title');
+    const bodyInput = document.getElementById('note-body');
+
+    if (titleInput) titleInput.addEventListener('input', () => this._scheduleAutosave());
+    if (bodyInput) bodyInput.addEventListener('input', () => this._scheduleAutosave());
+  },
+
+  _scheduleAutosave() {
+    if (this._autosaveTimer) clearTimeout(this._autosaveTimer);
+    this._autosaveTimer = setTimeout(() => this._performAutosave(), 1500);
+  },
+
+  _flushAutosave() {
+    if (this._autosaveTimer) {
+      clearTimeout(this._autosaveTimer);
+      this._autosaveTimer = null;
+      this._performAutosave();
+    }
+  },
+
+  _clearAutosave() {
+    if (this._autosaveTimer) {
+      clearTimeout(this._autosaveTimer);
+      this._autosaveTimer = null;
+    }
+    this._currentEditNote = null;
+  },
+
+  _performAutosave() {
+    this._autosaveTimer = null;
+    const titleInput = document.getElementById('note-title');
+    const bodyInput = document.getElementById('note-body');
+    const tagsContainer = document.getElementById('tags-input-container');
+    if (!titleInput || !bodyInput) return;
+
+    const tagElements = tagsContainer ? tagsContainer.querySelectorAll('.tag') : [];
+    const data = {
+      title: titleInput.value.trim(),
+      body: bodyInput.value,
+      tags: Array.from(tagElements).map(el => el.dataset.tag)
+    };
+
+    if (this._currentEditNote) {
+      // Existing note — update in place
+      this.updateNote(this._currentEditNote, data);
+    } else {
+      // New note — create it, then track for subsequent saves
+      const note = {
+        id: Storage.generateId(),
+        title: data.title || 'Untitled',
+        body: data.body,
+        tags: data.tags,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      this.notes.push(note);
+      this.save();
+      this.render();
+      this._currentEditNote = note;
+    }
+
+    this._showAutosaveIndicator();
+  },
+
+  _showAutosaveIndicator() {
+    const indicator = document.getElementById('autosave-indicator');
+    if (!indicator) return;
+    indicator.textContent = 'Saved';
+    indicator.classList.add('visible');
+    setTimeout(() => indicator.classList.remove('visible'), 2000);
   },
 
   setupTagsInput(initialTags) {
@@ -378,6 +453,7 @@ const Notes = {
         if (tagName && !this.hasTagInInput(tagName)) {
           this.addTagToInput(tagName);
           input.value = '';
+          this._scheduleAutosave();
         }
       }
     });
@@ -397,6 +473,7 @@ const Notes = {
 
     tagEl.querySelector('.remove-tag').addEventListener('click', () => {
       tagEl.remove();
+      this._scheduleAutosave();
     });
 
     container.insertBefore(tagEl, input);
