@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Bank</title>
+  <meta name="description" content="Organize, filter, and copy reusable feedback comments for student assignments">
+  <meta name="theme-color" content="#1a1a2e">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Loading Spinner -->
+  <div id="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Login Screen -->
+  <div class="login-container hidden" id="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">Feedback Bank</h1>
+        <p class="login-subtitle">Sign in to continue</p>
+      </div>
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" name="email" required autocomplete="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" required autocomplete="current-password" placeholder="••••••••">
+        </div>
+        <div class="login-error hidden" id="login-error"></div>
+        <button type="submit" class="login-btn">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div class="app-container hidden" id="app-container">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-top">
+        <h1 class="app-title">Feedback Bank</h1>
+        <div class="header-actions">
+          <button class="icon-btn" id="btn-settings" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" id="btn-signout" aria-label="Sign out">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Area -->
+      <div class="filter-area">
+        <div class="pill-row" id="class-pills"></div>
+        <div class="pill-row hidden" id="assignment-pills"></div>
+        <div class="search-row">
+          <div class="search-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="search-input" id="search-input" placeholder="Search comments...">
+            <button class="search-clear hidden" id="search-clear" aria-label="Clear search">&times;</button>
+          </div>
+          <button class="btn-add" id="btn-add-comment">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content"></main>
+  </div>
+
+  <!-- Slide-Out Panel -->
+  <div class="panel-backdrop" id="panel-backdrop"></div>
+  <div class="slide-panel" id="slide-panel" role="dialog" aria-label="Comment editor">
+    <div class="panel-header">
+      <span class="panel-title" id="panel-title">Add Comment</span>
+      <button class="panel-close" id="panel-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="panel-body">
+      <!-- Editor -->
+      <div class="panel-section">
+        <div class="panel-label">Comment</div>
+        <div class="editor-toolbar">
+          <button class="toolbar-btn" data-cmd="bold" title="Bold"><b>B</b></button>
+          <button class="toolbar-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+        </div>
+        <div class="editor-area" id="editor-area" contenteditable="true" data-placeholder="Write your feedback comment..."></div>
+      </div>
+
+      <!-- Category -->
+      <div class="panel-section">
+        <div class="panel-label">Category</div>
+        <div class="category-pills" id="editor-category">
+          <button class="cat-pill" data-cat="general">General</button>
+          <button class="cat-pill" data-cat="positive">Positive</button>
+          <button class="cat-pill" data-cat="constructive">Constructive</button>
+          <button class="cat-pill" data-cat="critical">Critical</button>
+        </div>
+      </div>
+
+      <!-- Class selector -->
+      <div class="panel-section">
+        <div class="panel-label">Classes</div>
+        <div class="checkbox-group" id="editor-classes"></div>
+      </div>
+
+      <!-- Assignment dropdown -->
+      <div class="panel-section hidden" id="editor-assignment-section">
+        <div class="panel-label">Assignment (optional)</div>
+        <select class="panel-select" id="editor-assignment">
+          <option value="">None</option>
+        </select>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn-archive hidden" id="btn-panel-archive">Archive</button>
+      <button class="btn-cancel" id="btn-panel-cancel">Cancel</button>
+      <button class="btn-save" id="btn-panel-save">Save</button>
+    </div>
+  </div>
+
+  <!-- Settings Overlay -->
+  <div class="settings-overlay" id="settings-overlay">
+    <div class="settings-header">
+      <span class="settings-title">Settings</span>
+      <button class="panel-close" id="settings-close" aria-label="Close settings">&times;</button>
+    </div>
+    <div class="settings-body">
+      <!-- Manage Classes -->
+      <div class="settings-section">
+        <h3>Manage Classes</h3>
+        <div class="settings-list" id="settings-classes"></div>
+        <div class="settings-add-row">
+          <input type="text" id="add-class-input" placeholder="New class name...">
+          <button class="settings-add-btn" id="add-class-btn">Add</button>
+        </div>
+      </div>
+
+      <!-- Manage Assignments -->
+      <div class="settings-section">
+        <h3>Manage Assignments</h3>
+        <select class="settings-class-select" id="settings-assignment-class">
+          <option value="">Select a class...</option>
+        </select>
+        <div class="settings-list" id="settings-assignments"></div>
+        <div class="settings-add-row hidden" id="add-assignment-row">
+          <input type="text" id="add-assignment-input" placeholder="New assignment name...">
+          <button class="settings-add-btn" id="add-assignment-btn">Add</button>
+        </div>
+      </div>
+
+      <!-- Bulk Actions -->
+      <div class="settings-section">
+        <h3>Bulk Actions</h3>
+        <div class="bulk-actions">
+          <div class="bulk-row">
+            <select id="bulk-class-select">
+              <option value="">Select a class...</option>
+            </select>
+            <button class="bulk-btn" id="bulk-archive-class" disabled>Archive All Comments</button>
+          </div>
+          <div class="bulk-row">
+            <select id="bulk-assignment-select" disabled>
+              <option value="">Select an assignment...</option>
+            </select>
+            <button class="bulk-btn" id="bulk-archive-assignment" disabled>Archive Comments</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div class="confirm-backdrop" id="confirm-backdrop">
+    <div class="confirm-dialog">
+      <div class="confirm-message" id="confirm-message"></div>
+      <div class="confirm-actions">
+        <button class="confirm-cancel" id="confirm-cancel">Cancel</button>
+        <button class="confirm-ok" id="confirm-ok">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- App Scripts -->
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
