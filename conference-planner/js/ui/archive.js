@@ -14,6 +14,7 @@ const ArchiveUI = (function() {
         document.getElementById('edit-conference-name-btn').addEventListener('click', showEditNameModal);
         document.getElementById('conference-name-modal-close').addEventListener('click', hideEditNameModal);
         document.getElementById('save-conference-name-btn').addEventListener('click', saveConferenceName);
+        document.getElementById('export-notes-btn').addEventListener('click', exportNotesToMarkdown);
     }
 
     function setNotesMap(notes) {
@@ -315,6 +316,86 @@ const ArchiveUI = (function() {
         document.getElementById('conference-title').textContent = name;
         hideEditNameModal();
         App.showToast('Conference renamed', 'success');
+    }
+
+    function exportNotesToMarkdown() {
+        const conf = conferences.find(c => c.id === currentConferenceId);
+        if (!conf) {
+            App.showToast('Conference not found', 'error');
+            return;
+        }
+
+        // Sort events by date
+        const sortedEvents = [...conf.events].sort((a, b) =>
+            new Date(a.startTime) - new Date(b.startTime)
+        );
+
+        // Build markdown content
+        let markdown = `# ${conf.name}\n\n`;
+        markdown += `*${formatDateRange(conf.startDate, conf.endDate)}*\n\n---\n\n`;
+
+        let hasAnyNotes = false;
+
+        sortedEvents.forEach(event => {
+            const note = notesMap[event.id];
+            if (note && note.content) {
+                hasAnyNotes = true;
+
+                // Event header
+                markdown += `## ${event.title}\n\n`;
+
+                // Event metadata
+                const eventDate = new Date(event.startTime);
+                const dateStr = eventDate.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                const timeStr = formatEventTime(event);
+                if (timeStr) {
+                    markdown += `**${dateStr}, ${timeStr}**\n`;
+                } else {
+                    markdown += `**${dateStr}**\n`;
+                }
+
+                if (event.location) {
+                    markdown += `*${event.location}*\n`;
+                }
+
+                markdown += '\n';
+
+                // Note content
+                markdown += note.content;
+                markdown += '\n\n---\n\n';
+            }
+        });
+
+        if (!hasAnyNotes) {
+            App.showToast('No notes to export', 'error');
+            return;
+        }
+
+        // Create and download file
+        const blob = new Blob([markdown], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+        // Create filename from conference name
+        const filename = conf.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '') + '-notes.md';
+
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        App.showToast('Notes exported', 'success');
     }
 
     function escapeHtml(text) {
