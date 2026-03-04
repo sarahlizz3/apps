@@ -45,6 +45,7 @@
                     <div class="schedule-header">
                         <h1>Upcoming</h1>
                         <div class="schedule-controls">
+                            <button id="manage-conferences-btn" class="btn btn-small btn-secondary">Conferences</button>
                             <button id="refresh-calendar-btn" class="btn btn-small btn-secondary">Sync</button>
                             <button id="add-event-btn" class="btn btn-small btn-primary">+ Add</button>
                         </div>
@@ -74,12 +75,18 @@
                                 <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                             </svg>
                         </button>
-                        <button id="edit-conference-name-btn" class="btn btn-icon" aria-label="Edit name">
+                        <button id="edit-conference-btn" class="btn btn-icon" aria-label="Edit conference">
                             <svg viewBox="0 0 24 24" width="20" height="20">
                                 <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                             </svg>
                         </button>
                     </div>
+                    <a id="conference-url-link" class="conference-url-link hidden" href="#" target="_blank" rel="noopener noreferrer">
+                        <svg viewBox="0 0 24 24" width="18" height="18">
+                            <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                        </svg>
+                        <span id="conference-url-text">View Schedule</span>
+                    </a>
                     <div id="conference-events-list"></div>
                 </section>
 
@@ -202,6 +209,12 @@
                                 <label for="parsed-description">Description</label>
                                 <textarea id="parsed-description" class="textarea"></textarea>
                             </div>
+                            <div class="form-group">
+                                <label for="parsed-conference">Conference</label>
+                                <select id="parsed-conference" class="select">
+                                    <option value="">No conference</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -210,12 +223,30 @@
                 </div>
             </div>
 
-            <!-- Edit Conference Name Modal -->
-            <div id="conference-name-modal-overlay" class="modal-overlay hidden">
+            <!-- Manage Conferences Modal -->
+            <div id="conferences-modal-overlay" class="modal-overlay hidden">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Conferences</h2>
+                        <button id="conferences-modal-close" class="btn btn-icon" aria-label="Close">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="conferences-modal-list"></div>
+                        <button id="add-conference-btn" class="btn btn-primary btn-block" style="margin-top: 16px;">+ Add Conference</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add/Edit Conference Modal -->
+            <div id="conference-edit-modal-overlay" class="modal-overlay hidden">
                 <div class="modal" style="max-width: 400px;">
                     <div class="modal-header">
-                        <h2>Name this Conference</h2>
-                        <button id="conference-name-modal-close" class="btn btn-icon" aria-label="Close">
+                        <h2 id="conference-edit-modal-title">Add Conference</h2>
+                        <button id="conference-edit-modal-close" class="btn btn-icon" aria-label="Close">
                             <svg viewBox="0 0 24 24" width="24" height="24">
                                 <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                             </svg>
@@ -223,12 +254,25 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="conference-name-input">Conference Name</label>
-                            <input type="text" id="conference-name-input" class="input" placeholder="e.g., SXSW 2026">
+                            <label for="conference-edit-name">Conference Name *</label>
+                            <input type="text" id="conference-edit-name" class="input" placeholder="e.g., SXSW 2026" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="conference-edit-start">Start Date *</label>
+                            <input type="date" id="conference-edit-start" class="input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="conference-edit-end">End Date *</label>
+                            <input type="date" id="conference-edit-end" class="input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="conference-edit-url">Schedule URL (optional)</label>
+                            <input type="url" id="conference-edit-url" class="input" placeholder="https://schedule.conference.com">
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button id="save-conference-name-btn" class="btn btn-primary">Save</button>
+                    <div class="modal-footer conference-edit-footer">
+                        <button id="delete-conference-btn" class="btn btn-danger hidden">Delete</button>
+                        <button id="save-conference-btn" class="btn btn-primary">Save Conference</button>
                     </div>
                 </div>
             </div>

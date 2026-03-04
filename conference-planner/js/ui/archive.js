@@ -1,8 +1,7 @@
 /**
- * Archive UI Module - Past conferences grouped by date proximity
+ * Archive UI Module - Past conferences from Firestore
  */
 const ArchiveUI = (function() {
-    let conferences = [];
     let currentConferenceId = null;
     let notesMap = {};
 
@@ -11,9 +10,11 @@ const ArchiveUI = (function() {
             App.navigate('archive');
         });
 
-        document.getElementById('edit-conference-name-btn').addEventListener('click', showEditNameModal);
-        document.getElementById('conference-name-modal-close').addEventListener('click', hideEditNameModal);
-        document.getElementById('save-conference-name-btn').addEventListener('click', saveConferenceName);
+        document.getElementById('edit-conference-btn').addEventListener('click', () => {
+            if (currentConferenceId) {
+                App.showConferenceEditModal(currentConferenceId);
+            }
+        });
         document.getElementById('export-notes-btn').addEventListener('click', exportNotesToMarkdown);
     }
 
@@ -25,37 +26,43 @@ const ArchiveUI = (function() {
     }
 
     function render() {
+        const conferences = Storage.getCachedConferences();
         const events = Storage.getCachedEvents();
         const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
 
-        // Filter to past events only
-        const pastEvents = events.filter(e => {
-            if (!e.startTime) return false;
-            return new Date(e.startTime) < now;
+        // Filter to past conferences only (end date has passed)
+        const pastConferences = conferences.filter(conf => conf.endDate < todayStr);
+
+        // Get events for each conference
+        const conferencesWithEvents = pastConferences.map(conf => {
+            const confEvents = events.filter(e => e.conferenceId === conf.id);
+            const eventsWithNotes = confEvents.filter(e => notesMap[e.id]?.content).length;
+            return {
+                ...conf,
+                events: confEvents,
+                eventsWithNotes
+            };
         });
-
-        // Group into conferences (events within 7 days of each other)
-        conferences = groupIntoConferences(pastEvents);
 
         const container = document.getElementById('conferences-list');
 
-        if (conferences.length === 0) {
+        if (conferencesWithEvents.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <svg viewBox="0 0 24 24" width="64" height="64">
                         <path fill="currentColor" d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/>
                     </svg>
                     <p>No past conferences</p>
-                    <p style="font-size: 0.875rem; margin-top: 8px;">Past events will appear here grouped by conference</p>
+                    <p style="font-size: 0.875rem; margin-top: 8px;">Past conferences will appear here after their end date</p>
                 </div>
             `;
             return;
         }
 
-        container.innerHTML = conferences.map(conf => {
-            const eventsWithNotes = conf.events.filter(e => notesMap[e.id]?.content).length;
-            const notesBadge = eventsWithNotes > 0
-                ? `<span class="notes-badge">${eventsWithNotes} notes</span>`
+        container.innerHTML = conferencesWithEvents.map(conf => {
+            const notesBadge = conf.eventsWithNotes > 0
+                ? `<span class="notes-badge">${conf.eventsWithNotes} notes</span>`
                 : '';
 
             return `
@@ -86,74 +93,10 @@ const ArchiveUI = (function() {
         });
     }
 
-    function groupIntoConferences(events) {
-        if (events.length === 0) return [];
-
-        // Sort by start time descending (most recent first)
-        const sorted = [...events].sort((a, b) =>
-            new Date(b.startTime) - new Date(a.startTime)
-        );
-
-        const groups = [];
-        let currentGroup = null;
-
-        sorted.forEach(event => {
-            const eventDate = new Date(event.startTime);
-
-            if (!currentGroup) {
-                currentGroup = {
-                    events: [event],
-                    startDate: eventDate,
-                    endDate: eventDate
-                };
-            } else {
-                // Check if within 7 days of current group
-                const daysDiff = Math.abs(eventDate - currentGroup.endDate) / (1000 * 60 * 60 * 24);
-
-                if (daysDiff <= 7) {
-                    currentGroup.events.push(event);
-                    if (eventDate < currentGroup.startDate) currentGroup.startDate = eventDate;
-                    if (eventDate > currentGroup.endDate) currentGroup.endDate = eventDate;
-                } else {
-                    groups.push(currentGroup);
-                    currentGroup = {
-                        events: [event],
-                        startDate: eventDate,
-                        endDate: eventDate
-                    };
-                }
-            }
-        });
-
-        if (currentGroup) {
-            groups.push(currentGroup);
-        }
-
-        // Generate IDs and names, load saved names
-        return groups.map((group, index) => {
-            const id = generateConferenceId(group.startDate, group.endDate);
-            const savedName = Storage.getConferenceName(id);
-            const defaultName = formatDateRange(group.startDate, group.endDate);
-
-            return {
-                id,
-                name: savedName || defaultName,
-                events: group.events,
-                startDate: group.startDate,
-                endDate: group.endDate
-            };
-        });
-    }
-
-    function generateConferenceId(startDate, endDate) {
-        const start = startDate.toISOString().split('T')[0];
-        const end = endDate.toISOString().split('T')[0];
-        return `conf-${start}-${end}`;
-    }
-
     function formatDateRange(startDate, endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
+        // Handle both Date objects and ISO date strings
+        const start = typeof startDate === 'string' ? new Date(startDate + 'T00:00:00') : new Date(startDate);
+        const end = typeof endDate === 'string' ? new Date(endDate + 'T00:00:00') : new Date(endDate);
 
         const sameMonth = start.getMonth() === end.getMonth();
         const sameDay = start.toDateString() === end.toDateString();
@@ -169,6 +112,7 @@ const ArchiveUI = (function() {
 
     function loadConference(conferenceId) {
         currentConferenceId = conferenceId;
+        const conferences = Storage.getCachedConferences();
         const conf = conferences.find(c => c.id === conferenceId);
 
         if (!conf) {
@@ -179,10 +123,22 @@ const ArchiveUI = (function() {
 
         document.getElementById('conference-title').textContent = conf.name;
 
+        // Show/hide schedule URL link
+        const urlLink = document.getElementById('conference-url-link');
+        if (conf.scheduleUrl) {
+            urlLink.href = conf.scheduleUrl;
+            document.getElementById('conference-url-text').textContent = 'View Schedule';
+            urlLink.classList.remove('hidden');
+        } else {
+            urlLink.classList.add('hidden');
+        }
+
         const container = document.getElementById('conference-events-list');
+        const events = Storage.getCachedEvents();
+        const confEvents = events.filter(e => e.conferenceId === conferenceId);
 
         // Sort events by date
-        const sortedEvents = [...conf.events].sort((a, b) =>
+        const sortedEvents = [...confEvents].sort((a, b) =>
             new Date(a.startTime) - new Date(b.startTime)
         );
 
@@ -291,42 +247,19 @@ const ArchiveUI = (function() {
         return startStr;
     }
 
-    function showEditNameModal() {
-        const conf = conferences.find(c => c.id === currentConferenceId);
-        if (!conf) return;
-
-        document.getElementById('conference-name-input').value = conf.name;
-        document.getElementById('conference-name-modal-overlay').classList.remove('hidden');
-    }
-
-    function hideEditNameModal() {
-        document.getElementById('conference-name-modal-overlay').classList.add('hidden');
-    }
-
-    async function saveConferenceName() {
-        const name = document.getElementById('conference-name-input').value.trim();
-        if (!name) return;
-
-        await Storage.saveConferenceName(currentConferenceId, name);
-
-        // Update local state
-        const conf = conferences.find(c => c.id === currentConferenceId);
-        if (conf) conf.name = name;
-
-        document.getElementById('conference-title').textContent = name;
-        hideEditNameModal();
-        App.showToast('Conference renamed', 'success');
-    }
-
     function exportNotesToMarkdown() {
+        const conferences = Storage.getCachedConferences();
         const conf = conferences.find(c => c.id === currentConferenceId);
         if (!conf) {
             App.showToast('Conference not found', 'error');
             return;
         }
 
+        const events = Storage.getCachedEvents();
+        const confEvents = events.filter(e => e.conferenceId === currentConferenceId);
+
         // Sort events by date
-        const sortedEvents = [...conf.events].sort((a, b) =>
+        const sortedEvents = [...confEvents].sort((a, b) =>
             new Date(a.startTime) - new Date(b.startTime)
         );
 

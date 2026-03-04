@@ -4,9 +4,10 @@
 const Storage = (function() {
     let eventsCache = [];
     let notesCache = [];
-    let conferenceNamesCache = {};
+    let conferencesCache = [];
     let eventsListener = null;
     let notesListener = null;
+    let conferencesListener = null;
 
     function getUserCollection(collection) {
         const userId = FirebaseApp.getUserId();
@@ -44,6 +45,7 @@ const Storage = (function() {
             location: eventData.location || null,
             description: eventData.description || null,
             calendarEventId: eventData.calendarEventId || null,
+            conferenceId: eventData.conferenceId || null,
             isManual: eventData.isManual !== false,
             createdAt: eventData.createdAt || firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -219,29 +221,89 @@ const Storage = (function() {
         return notesCache;
     }
 
-    // Conference names (stored in a separate collection)
-    async function loadConferenceNames() {
-        const col = getUserCollection('conferenceNames');
-        if (!col) return {};
+    // Conferences CRUD
+    async function getConferences() {
+        const col = getUserCollection('conferences');
+        if (!col) return [];
 
-        const snapshot = await col.get();
-        conferenceNamesCache = {};
-        snapshot.docs.forEach(doc => {
-            conferenceNamesCache[doc.id] = doc.data().name;
-        });
-        return conferenceNamesCache;
+        const snapshot = await col.orderBy('startDate', 'desc').get();
+        conferencesCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return conferencesCache;
     }
 
-    function getConferenceName(conferenceId) {
-        return conferenceNamesCache[conferenceId] || null;
+    async function getConference(conferenceId) {
+        const col = getUserCollection('conferences');
+        if (!col) return null;
+
+        const doc = await col.doc(conferenceId).get();
+        if (!doc.exists) return null;
+        return { id: doc.id, ...doc.data() };
     }
 
-    async function saveConferenceName(conferenceId, name) {
-        const col = getUserCollection('conferenceNames');
+    async function saveConference(conferenceData) {
+        const col = getUserCollection('conferences');
         if (!col) throw new Error('Not authenticated');
 
-        await col.doc(conferenceId).set({ name, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        conferenceNamesCache[conferenceId] = name;
+        const data = {
+            name: conferenceData.name || '',
+            startDate: conferenceData.startDate || null,
+            endDate: conferenceData.endDate || null,
+            scheduleUrl: conferenceData.scheduleUrl || null,
+            createdAt: conferenceData.createdAt || firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (conferenceData.id) {
+            await col.doc(conferenceData.id).update(data);
+            return conferenceData.id;
+        } else {
+            const docRef = await col.add(data);
+            return docRef.id;
+        }
+    }
+
+    async function deleteConference(conferenceId) {
+        const col = getUserCollection('conferences');
+        if (!col) throw new Error('Not authenticated');
+
+        // Unlink events from this conference (set conferenceId to null)
+        const eventsCol = getUserCollection('events');
+        if (eventsCol) {
+            const snapshot = await eventsCol.where('conferenceId', '==', conferenceId).get();
+            const batch = FirebaseApp.getDb().batch();
+            snapshot.docs.forEach(doc => {
+                batch.update(doc.ref, { conferenceId: null });
+            });
+            await batch.commit();
+        }
+
+        await col.doc(conferenceId).delete();
+    }
+
+    function subscribeToConferences(callback) {
+        const col = getUserCollection('conferences');
+        if (!col) return () => {};
+
+        conferencesListener = col.orderBy('startDate', 'desc').onSnapshot(snapshot => {
+            conferencesCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            callback(conferencesCache);
+        });
+
+        return () => {
+            if (conferencesListener) conferencesListener();
+        };
+    }
+
+    function getCachedConferences() {
+        return conferencesCache;
+    }
+
+    // Get conferences that match an event's date
+    function getConferencesForDate(dateStr) {
+        if (!dateStr) return [];
+        const eventDate = dateStr.split('T')[0]; // Get just the date part
+        return conferencesCache.filter(conf => {
+            return conf.startDate <= eventDate && conf.endDate >= eventDate;
+        });
     }
 
     return {
@@ -261,8 +323,12 @@ const Storage = (function() {
         importData,
         getCachedEvents,
         getCachedNotes,
-        loadConferenceNames,
-        getConferenceName,
-        saveConferenceName
+        getConferences,
+        getConference,
+        saveConference,
+        deleteConference,
+        subscribeToConferences,
+        getCachedConferences,
+        getConferencesForDate
     };
 })();

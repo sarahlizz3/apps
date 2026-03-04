@@ -982,6 +982,87 @@ main {
     white-space: nowrap;
 }
 
-#edit-conference-name-btn {
+#edit-conference-btn {
     flex-shrink: 0;
+}
+
+/* Conference URL Link */
+.conference-url-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    background: var(--gray-700);
+    border-radius: var(--radius);
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.conference-url-link:hover {
+    background: var(--gray-600);
+}
+
+.conference-url-link svg {
+    flex-shrink: 0;
+}
+
+/* Conference list in modal */
+.conference-list-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: var(--gray-700);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+}
+
+.conference-list-item:last-child {
+    margin-bottom: 0;
+}
+
+.conference-list-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.conference-list-name {
+    font-weight: 500;
+    color: var(--gray-100);
+    margin-bottom: 2px;
+}
+
+.conference-list-dates {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+}
+
+/* Date input styling */
+input[type="date"] {
+    color-scheme: dark;
+}
+
+/* Conference edit modal footer */
+.conference-edit-footer {
+    display: flex;
+    gap: 12px;
+}
+
+.conference-edit-footer .btn-danger {
+    flex: 0 0 auto;
+}
+
+.conference-edit-footer .btn-primary {
+    flex: 1;
+}
+
+/* Select dropdown styling */
+.select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
 }

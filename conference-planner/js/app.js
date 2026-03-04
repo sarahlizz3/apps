@@ -5,6 +5,7 @@ const App = (function() {
     let currentScreen = 'schedule';
     let currentParams = {};
     let confirmResolve = null;
+    let editingConferenceId = null;
 
     async function init() {
         // Initialize Firebase
@@ -40,6 +41,16 @@ const App = (function() {
             hideConfirmModal(true);
         });
 
+        // Conferences modal
+        document.getElementById('manage-conferences-btn').addEventListener('click', showConferencesModal);
+        document.getElementById('conferences-modal-close').addEventListener('click', hideConferencesModal);
+        document.getElementById('add-conference-btn').addEventListener('click', () => showConferenceEditModal(null));
+
+        // Conference edit modal
+        document.getElementById('conference-edit-modal-close').addEventListener('click', hideConferenceEditModal);
+        document.getElementById('save-conference-btn').addEventListener('click', handleSaveConference);
+        document.getElementById('delete-conference-btn').addEventListener('click', handleDeleteConference);
+
         // Initialize UI modules
         ScheduleUI.init();
         ArchiveUI.init();
@@ -57,9 +68,6 @@ const App = (function() {
     }
 
     function onAuthReady() {
-        // Load conference names
-        Storage.loadConferenceNames();
-
         // Subscribe to data changes
         Storage.subscribeToEvents((events) => {
             ScheduleUI.render();
@@ -73,6 +81,10 @@ const App = (function() {
             ArchiveUI.render();
         });
 
+        Storage.subscribeToConferences((conferences) => {
+            ArchiveUI.render();
+        });
+
         // Initial data load
         Storage.getEvents().then(() => {
             ScheduleUI.render();
@@ -82,6 +94,7 @@ const App = (function() {
             ScheduleUI.setNotesMap(notes);
             ArchiveUI.setNotesMap(notes);
         });
+        Storage.getConferences();
     }
 
     async function handleLogin(e) {
@@ -210,11 +223,54 @@ const App = (function() {
         document.getElementById('parsed-preview').dataset.startTime = parsed.startTime || '';
         document.getElementById('parsed-preview').dataset.endTime = parsed.endTime || '';
 
+        // Populate conference dropdown
+        populateConferenceDropdown(parsed.startTime);
+
         document.getElementById('parsed-preview').classList.remove('hidden');
+    }
+
+    function populateConferenceDropdown(dateStr) {
+        const select = document.getElementById('parsed-conference');
+        const matchingConferences = Storage.getConferencesForDate(dateStr);
+        const allConferences = Storage.getCachedConferences();
+
+        select.innerHTML = '<option value="">No conference</option>';
+
+        // Add matching conferences first (highlighted)
+        matchingConferences.forEach(conf => {
+            const option = document.createElement('option');
+            option.value = conf.id;
+            option.textContent = conf.name;
+            select.appendChild(option);
+        });
+
+        // Add separator and other conferences if there are matching ones
+        if (matchingConferences.length > 0 && allConferences.length > matchingConferences.length) {
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '──────────';
+            select.appendChild(separator);
+        }
+
+        // Add non-matching conferences
+        allConferences.forEach(conf => {
+            if (!matchingConferences.find(m => m.id === conf.id)) {
+                const option = document.createElement('option');
+                option.value = conf.id;
+                option.textContent = conf.name + ' (dates don\'t match)';
+                select.appendChild(option);
+            }
+        });
+
+        // Auto-select if there's exactly one matching conference
+        if (matchingConferences.length === 1) {
+            select.value = matchingConferences[0].id;
+        }
     }
 
     async function handleSaveEvent() {
         const preview = document.getElementById('parsed-preview');
+        const conferenceId = document.getElementById('parsed-conference').value || null;
 
         const eventData = {
             title: document.getElementById('parsed-title').value || 'Untitled Event',
@@ -222,6 +278,7 @@ const App = (function() {
             endTime: preview.dataset.endTime || null,
             location: document.getElementById('parsed-location').value || null,
             description: document.getElementById('parsed-description').value || null,
+            conferenceId: conferenceId,
             isManual: true
         };
 
@@ -271,6 +328,193 @@ const App = (function() {
         }
     }
 
+    // Conference management functions
+    function showConferencesModal() {
+        renderConferencesList();
+        document.getElementById('conferences-modal-overlay').classList.remove('hidden');
+    }
+
+    function hideConferencesModal() {
+        document.getElementById('conferences-modal-overlay').classList.add('hidden');
+    }
+
+    function renderConferencesList() {
+        const container = document.getElementById('conferences-modal-list');
+        const conferences = Storage.getCachedConferences();
+
+        if (conferences.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state" style="padding: 24px;">
+                    <p style="color: var(--gray-400);">No conferences yet</p>
+                    <p style="font-size: 0.875rem; color: var(--gray-500);">Create a conference to group your sessions</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = conferences.map(conf => {
+            const dateRange = formatConferenceDateRange(conf.startDate, conf.endDate);
+            return `
+                <div class="conference-list-item" data-id="${conf.id}">
+                    <div class="conference-list-info">
+                        <div class="conference-list-name">${escapeHtml(conf.name)}</div>
+                        <div class="conference-list-dates">${dateRange}</div>
+                    </div>
+                    <button class="btn btn-icon conference-edit-btn" data-id="${conf.id}" aria-label="Edit">
+                        <svg viewBox="0 0 24 24" width="18" height="18">
+                            <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        // Add click handlers for edit buttons
+        container.querySelectorAll('.conference-edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const confId = btn.dataset.id;
+                showConferenceEditModal(confId);
+            });
+        });
+    }
+
+    function formatConferenceDateRange(startDate, endDate) {
+        if (!startDate || !endDate) return '';
+        const start = new Date(startDate + 'T00:00:00');
+        const end = new Date(endDate + 'T00:00:00');
+
+        const sameMonth = start.getMonth() === end.getMonth();
+        const sameDay = start.toDateString() === end.toDateString();
+
+        if (sameDay) {
+            return start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        } else if (sameMonth) {
+            return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.getDate()}, ${end.getFullYear()}`;
+        } else {
+            return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        }
+    }
+
+    function showConferenceEditModal(conferenceId) {
+        editingConferenceId = conferenceId;
+        const modal = document.getElementById('conference-edit-modal-overlay');
+        const titleEl = document.getElementById('conference-edit-modal-title');
+        const deleteBtn = document.getElementById('delete-conference-btn');
+
+        if (conferenceId) {
+            // Edit mode
+            titleEl.textContent = 'Edit Conference';
+            deleteBtn.classList.remove('hidden');
+
+            const conf = Storage.getCachedConferences().find(c => c.id === conferenceId);
+            if (conf) {
+                document.getElementById('conference-edit-name').value = conf.name || '';
+                document.getElementById('conference-edit-start').value = conf.startDate || '';
+                document.getElementById('conference-edit-end').value = conf.endDate || '';
+                document.getElementById('conference-edit-url').value = conf.scheduleUrl || '';
+            }
+        } else {
+            // Add mode
+            titleEl.textContent = 'Add Conference';
+            deleteBtn.classList.add('hidden');
+
+            document.getElementById('conference-edit-name').value = '';
+            document.getElementById('conference-edit-start').value = '';
+            document.getElementById('conference-edit-end').value = '';
+            document.getElementById('conference-edit-url').value = '';
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function hideConferenceEditModal() {
+        document.getElementById('conference-edit-modal-overlay').classList.add('hidden');
+        editingConferenceId = null;
+    }
+
+    async function handleSaveConference() {
+        const name = document.getElementById('conference-edit-name').value.trim();
+        const startDate = document.getElementById('conference-edit-start').value;
+        const endDate = document.getElementById('conference-edit-end').value;
+        const scheduleUrl = document.getElementById('conference-edit-url').value.trim() || null;
+
+        if (!name) {
+            showToast('Please enter a conference name', 'error');
+            return;
+        }
+        if (!startDate || !endDate) {
+            showToast('Please enter start and end dates', 'error');
+            return;
+        }
+        if (startDate > endDate) {
+            showToast('End date must be after start date', 'error');
+            return;
+        }
+
+        try {
+            await Storage.saveConference({
+                id: editingConferenceId,
+                name,
+                startDate,
+                endDate,
+                scheduleUrl
+            });
+
+            hideConferenceEditModal();
+            renderConferencesList();
+            showToast(editingConferenceId ? 'Conference updated' : 'Conference created', 'success');
+
+            // Re-render archive if we're on that screen or conference detail
+            if (currentScreen === 'archive' || currentScreen === 'conference') {
+                ArchiveUI.render();
+                if (currentScreen === 'conference') {
+                    ArchiveUI.loadConference(editingConferenceId);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to save conference:', error);
+            showToast('Failed to save conference', 'error');
+        }
+    }
+
+    async function handleDeleteConference() {
+        if (!editingConferenceId) return;
+
+        const conf = Storage.getCachedConferences().find(c => c.id === editingConferenceId);
+        const confName = conf ? conf.name : 'this conference';
+
+        const confirmed = await confirm(
+            'Delete Conference',
+            `Delete "${confName}"? This will not delete the sessions, but they will no longer be grouped together.`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            await Storage.deleteConference(editingConferenceId);
+            hideConferenceEditModal();
+            renderConferencesList();
+            showToast('Conference deleted', 'success');
+
+            // Navigate back to archive if we were viewing this conference
+            if (currentScreen === 'conference' && currentParams.conferenceId === editingConferenceId) {
+                navigate('archive');
+            } else {
+                ArchiveUI.render();
+            }
+        } catch (error) {
+            console.error('Failed to delete conference:', error);
+            showToast('Failed to delete conference', 'error');
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', init);
 
@@ -278,6 +522,8 @@ const App = (function() {
         navigate,
         showToast,
         confirm,
-        onAuthReady
+        onAuthReady,
+        showConferenceEditModal,
+        renderConferencesList
     };
 })();
