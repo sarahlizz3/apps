@@ -1017,6 +1017,12 @@ main {
     background: var(--gray-700);
     border-radius: var(--radius);
     margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.conference-list-item:hover {
+    background: var(--gray-600);
 }
 
 .conference-list-item:last-child {

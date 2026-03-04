@@ -369,6 +369,15 @@ const App = (function() {
             `;
         }).join('');
 
+        // Add click handlers for conference items (navigate to detail)
+        container.querySelectorAll('.conference-list-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const confId = item.dataset.id;
+                hideConferencesModal();
+                navigate('conference', { conferenceId: confId });
+            });
+        });
+
         // Add click handlers for edit buttons
         container.querySelectorAll('.conference-edit-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
