@@ -71,12 +71,19 @@ const ScheduleUI = (function() {
         }
     }
 
+    function getLocalDateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     function groupByDate(events) {
         const groups = {};
 
         events.forEach(event => {
             const date = event.startTime ? new Date(event.startTime) : new Date();
-            const dateKey = date.toISOString().split('T')[0];
+            const dateKey = getLocalDateKey(date);
 
             if (!groups[dateKey]) {
                 groups[dateKey] = [];
@@ -94,14 +101,17 @@ const ScheduleUI = (function() {
     }
 
     function formatDateHeader(dateKey) {
-        const date = new Date(dateKey + 'T12:00:00');
+        const [year, month, day] = dateKey.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
         const today = new Date();
+        const todayKey = getLocalDateKey(today);
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowKey = getLocalDateKey(tomorrow);
 
-        if (dateKey === today.toISOString().split('T')[0]) {
+        if (dateKey === todayKey) {
             return 'Today';
-        } else if (dateKey === tomorrow.toISOString().split('T')[0]) {
+        } else if (dateKey === tomorrowKey) {
             return 'Tomorrow';
         }
 
