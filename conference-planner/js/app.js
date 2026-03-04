@@ -83,6 +83,7 @@ const App = (function() {
 
         Storage.subscribeToConferences((conferences) => {
             ArchiveUI.render();
+            updateActiveConferenceLink();
         });
 
         // Initial data load
@@ -522,6 +523,25 @@ const App = (function() {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    function updateActiveConferenceLink() {
+        const link = document.getElementById('active-conference-link');
+        const conferences = Storage.getCachedConferences();
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // Find active conference (today is between start and end, and has a URL)
+        const activeConf = conferences.find(conf =>
+            conf.scheduleUrl && conf.startDate <= todayStr && conf.endDate >= todayStr
+        );
+
+        if (activeConf) {
+            link.href = activeConf.scheduleUrl;
+            link.textContent = activeConf.name;
+            link.classList.remove('hidden');
+        } else {
+            link.classList.add('hidden');
+        }
     }
 
     // Initialize when DOM is ready
