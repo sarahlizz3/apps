@@ -2,7 +2,7 @@
  * Google Calendar API Integration
  */
 const Calendar = (function() {
-    const API_KEY = 'AIzaSyBMeSGxyNIkNBEhvh-zu81TsRyEEV26WQ4';
+    const API_KEY = 'AIzaSyBKNVDoeBxAOCIb8e_0rZz5FJ3pQ_uBHD8';
     const CALENDAR_ID = '9a92999521f429997a64896480d5338c83798c89f7623663dd8f9302dbd75a40@group.calendar.google.com';
 
     let lastSyncTime = null;
