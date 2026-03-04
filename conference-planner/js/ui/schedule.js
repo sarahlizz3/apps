@@ -1,5 +1,5 @@
 /**
- * Schedule UI Module
+ * Schedule UI Module - Shows upcoming events only
  */
 const ScheduleUI = (function() {
     let notesMap = {};
@@ -21,7 +21,7 @@ const ScheduleUI = (function() {
             App.showToast('Sync failed: ' + error.message, 'error');
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Sync Calendar';
+            btn.textContent = 'Sync';
         }
     }
 
@@ -33,16 +33,24 @@ const ScheduleUI = (function() {
     }
 
     function render() {
-        const events = Storage.getCachedEvents();
+        const allEvents = Storage.getCachedEvents();
         const container = document.getElementById('events-list');
+        const now = new Date();
 
-        if (events.length === 0) {
+        // Filter to upcoming events only (today and future)
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const upcomingEvents = allEvents.filter(e => {
+            if (!e.startTime) return true; // Show events without dates
+            return new Date(e.startTime) >= todayStart;
+        });
+
+        if (upcomingEvents.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <svg viewBox="0 0 24 24" width="64" height="64">
                         <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
                     </svg>
-                    <p>No events</p>
+                    <p>No upcoming events</p>
                     <p style="font-size: 0.875rem; margin-top: 8px;">Sync from calendar or add events manually</p>
                 </div>
             `;
@@ -50,7 +58,7 @@ const ScheduleUI = (function() {
         }
 
         // Group events by date
-        const grouped = groupByDate(events);
+        const grouped = groupByDate(upcomingEvents);
         container.innerHTML = '';
 
         for (const [dateKey, dayEvents] of Object.entries(grouped)) {
@@ -131,16 +139,16 @@ const ScheduleUI = (function() {
 
         const timeStr = formatEventTime(event);
         const locationStr = event.location ? `<span class="event-location">${escapeHtml(event.location)}</span>` : '';
-        const noteIndicator = hasNote ? '<span class="note-indicator" title="Has notes">📝</span>' : '';
 
         item.innerHTML = `
             <div class="event-info">
-                <div class="event-title">${escapeHtml(event.title)} ${noteIndicator}</div>
+                <div class="event-title ${hasNote ? 'has-notes' : ''}">${escapeHtml(event.title)}</div>
                 <div class="event-meta">
                     ${timeStr ? `<span class="event-time">${timeStr}</span>` : ''}
                     ${locationStr}
                 </div>
             </div>
+            ${hasNote ? '<span class="note-indicator-icon" title="Has notes"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span>' : ''}
             <div class="event-arrow">
                 <svg viewBox="0 0 24 24" width="20" height="20">
                     <path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>

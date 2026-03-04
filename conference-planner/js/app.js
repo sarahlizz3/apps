@@ -42,6 +42,7 @@ const App = (function() {
 
         // Initialize UI modules
         ScheduleUI.init();
+        ArchiveUI.init();
         EventUI.init();
         SettingsUI.init();
 
@@ -56,20 +57,30 @@ const App = (function() {
     }
 
     function onAuthReady() {
+        // Load conference names
+        Storage.loadConferenceNames();
+
         // Subscribe to data changes
         Storage.subscribeToEvents((events) => {
             ScheduleUI.render();
+            ArchiveUI.render();
         });
 
         Storage.subscribeToNotes((notes) => {
             ScheduleUI.setNotesMap(notes);
+            ArchiveUI.setNotesMap(notes);
             ScheduleUI.render();
+            ArchiveUI.render();
         });
 
         // Initial data load
-        Storage.getEvents().then(() => ScheduleUI.render());
+        Storage.getEvents().then(() => {
+            ScheduleUI.render();
+            ArchiveUI.render();
+        });
         Storage.getNotes().then((notes) => {
             ScheduleUI.setNotesMap(notes);
+            ArchiveUI.setNotesMap(notes);
         });
     }
 
@@ -105,14 +116,23 @@ const App = (function() {
 
         // Update hash
         if (screen === 'event' && params.eventId) {
-            window.location.hash = `event/${params.eventId}`;
+            if (params.fromConference) {
+                window.location.hash = `event/${params.eventId}?from=${params.fromConference}`;
+            } else {
+                window.location.hash = `event/${params.eventId}`;
+            }
+        } else if (screen === 'conference' && params.conferenceId) {
+            window.location.hash = `conference/${params.conferenceId}`;
         } else {
             window.location.hash = screen;
         }
 
-        // Update nav
+        // Update nav (archive shows as active for conference detail too)
         document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.toggle('active', item.dataset.screen === screen);
+            const itemScreen = item.dataset.screen;
+            const isActive = itemScreen === screen ||
+                (itemScreen === 'archive' && screen === 'conference');
+            item.classList.toggle('active', isActive);
         });
 
         // Show/hide screens
@@ -127,7 +147,11 @@ const App = (function() {
 
         // Screen-specific logic
         if (screen === 'event' && params.eventId) {
-            EventUI.load(params.eventId);
+            EventUI.load(params.eventId, params.fromConference);
+        } else if (screen === 'conference' && params.conferenceId) {
+            ArchiveUI.loadConference(params.conferenceId);
+        } else if (screen === 'archive') {
+            ArchiveUI.render();
         } else if (screen === 'settings') {
             SettingsUI.render();
         }
@@ -135,12 +159,24 @@ const App = (function() {
 
     function handleHashChange() {
         const hash = window.location.hash.slice(1) || 'schedule';
-        const parts = hash.split('/');
+        const [path, query] = hash.split('?');
+        const parts = path.split('/');
         const screen = parts[0];
 
+        // Parse query params
+        const params = {};
+        if (query) {
+            query.split('&').forEach(p => {
+                const [key, value] = p.split('=');
+                params[key] = value;
+            });
+        }
+
         if (screen === 'event' && parts[1]) {
-            navigate('event', { eventId: parts[1] });
-        } else if (['schedule', 'add', 'settings'].includes(screen)) {
+            navigate('event', { eventId: parts[1], fromConference: params.from });
+        } else if (screen === 'conference' && parts[1]) {
+            navigate('conference', { conferenceId: parts[1] });
+        } else if (['schedule', 'archive', 'settings'].includes(screen)) {
             navigate(screen);
         } else {
             navigate('schedule');

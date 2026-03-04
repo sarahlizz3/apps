@@ -4,6 +4,7 @@
 const Storage = (function() {
     let eventsCache = [];
     let notesCache = [];
+    let conferenceNamesCache = {};
     let eventsListener = null;
     let notesListener = null;
 
@@ -218,6 +219,31 @@ const Storage = (function() {
         return notesCache;
     }
 
+    // Conference names (stored in a separate collection)
+    async function loadConferenceNames() {
+        const col = getUserCollection('conferenceNames');
+        if (!col) return {};
+
+        const snapshot = await col.get();
+        conferenceNamesCache = {};
+        snapshot.docs.forEach(doc => {
+            conferenceNamesCache[doc.id] = doc.data().name;
+        });
+        return conferenceNamesCache;
+    }
+
+    function getConferenceName(conferenceId) {
+        return conferenceNamesCache[conferenceId] || null;
+    }
+
+    async function saveConferenceName(conferenceId, name) {
+        const col = getUserCollection('conferenceNames');
+        if (!col) throw new Error('Not authenticated');
+
+        await col.doc(conferenceId).set({ name, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        conferenceNamesCache[conferenceId] = name;
+    }
+
     return {
         getEvents,
         getEvent,
@@ -234,6 +260,9 @@ const Storage = (function() {
         exportData,
         importData,
         getCachedEvents,
-        getCachedNotes
+        getCachedNotes,
+        loadConferenceNames,
+        getConferenceName,
+        saveConferenceName
     };
 })();

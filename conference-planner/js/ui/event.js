@@ -4,6 +4,7 @@
 const EventUI = (function() {
     let currentEvent = null;
     let currentNote = null;
+    let fromConference = null;
     let saveTimeout = null;
     let unsavedChanges = false;
     let isPreviewMode = false;
@@ -16,7 +17,12 @@ const EventUI = (function() {
             if (unsavedChanges) {
                 saveNote();
             }
-            App.navigate('schedule');
+            // Go back to conference if we came from there
+            if (fromConference) {
+                App.navigate('conference', { conferenceId: fromConference });
+            } else {
+                App.navigate('schedule');
+            }
         });
 
         // Note editor
@@ -33,7 +39,8 @@ const EventUI = (function() {
         document.getElementById('delete-event-btn').addEventListener('click', handleDeleteEvent);
     }
 
-    async function load(eventId) {
+    async function load(eventId, fromConf = null) {
+        fromConference = fromConf;
         currentEvent = await Storage.getEvent(eventId);
 
         if (!currentEvent) {
@@ -233,7 +240,11 @@ const EventUI = (function() {
             try {
                 await Storage.deleteEvent(currentEvent.id);
                 App.showToast('Event deleted', 'success');
-                App.navigate('schedule');
+                if (fromConference) {
+                    App.navigate('conference', { conferenceId: fromConference });
+                } else {
+                    App.navigate('schedule');
+                }
             } catch (error) {
                 console.error('Failed to delete event:', error);
                 App.showToast('Failed to delete event', 'error');
@@ -250,6 +261,7 @@ const EventUI = (function() {
         }
         currentEvent = null;
         currentNote = null;
+        fromConference = null;
     }
 
     return {
