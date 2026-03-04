@@ -526,21 +526,22 @@ const App = (function() {
     }
 
     function updateActiveConferenceLink() {
-        const link = document.getElementById('active-conference-link');
+        const container = document.getElementById('active-conference-links');
         const conferences = Storage.getCachedConferences();
         const todayStr = new Date().toISOString().split('T')[0];
 
-        // Find active conference (today is between start and end, and has a URL)
-        const activeConf = conferences.find(conf =>
-            conf.scheduleUrl && conf.startDate <= todayStr && conf.endDate >= todayStr
-        );
+        // Find upcoming/active conferences (end date hasn't passed, and has a URL)
+        const upcomingConfs = conferences.filter(conf =>
+            conf.scheduleUrl && conf.endDate >= todayStr
+        ).sort((a, b) => a.startDate.localeCompare(b.startDate));
 
-        if (activeConf) {
-            link.href = activeConf.scheduleUrl;
-            link.textContent = activeConf.name;
-            link.classList.remove('hidden');
+        if (upcomingConfs.length > 0) {
+            container.innerHTML = upcomingConfs.map(conf =>
+                `<a class="active-conference-link" href="${escapeHtml(conf.scheduleUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(conf.name)}</a>`
+            ).join('');
+            container.classList.remove('hidden');
         } else {
-            link.classList.add('hidden');
+            container.classList.add('hidden');
         }
     }
 
