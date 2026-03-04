@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f0f12">
+    <meta name="description" content="Conference attendance planner with notes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Conference Planner</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="login-screen">
+            <div class="login-container">
+                <h1>Conference Planner</h1>
+                <form id="login-form" class="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="input" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" class="input" required autocomplete="current-password">
+                    </div>
+                    <div id="login-error" class="login-error hidden"></div>
+                    <button type="submit" id="login-btn" class="btn btn-primary btn-block">Sign In</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- App Content (hidden until authenticated) -->
+        <div id="app-content" class="hidden">
+            <!-- Offline Indicator -->
+            <div id="offline-indicator" class="offline-indicator hidden">Offline</div>
+
+            <main id="main-content">
+                <!-- Schedule Screen -->
+                <section id="screen-schedule" class="screen active">
+                    <div class="schedule-header">
+                        <h1>Schedule</h1>
+                        <div class="schedule-controls">
+                            <button id="refresh-calendar-btn" class="btn btn-small btn-secondary">Sync Calendar</button>
+                            <button id="add-event-btn" class="btn btn-small btn-primary">+ Add</button>
+                        </div>
+                    </div>
+                    <div id="events-list"></div>
+                </section>
+
+                <!-- Event Detail Screen -->
+                <section id="screen-event" class="screen">
+                    <div class="event-header">
+                        <button id="event-back-btn" class="btn btn-icon" aria-label="Back">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                            </svg>
+                        </button>
+                        <h1>Event</h1>
+                    </div>
+
+                    <div class="event-details">
+                        <div id="event-title"></div>
+                        <div id="event-datetime"></div>
+                        <div id="event-location" class="hidden"></div>
+                        <div id="event-description" class="hidden"></div>
+                    </div>
+
+                    <div class="notes-section">
+                        <div class="notes-header">
+                            <h2>Notes</h2>
+                            <div class="notes-controls">
+                                <span id="save-status" class="save-status saved">Saved</span>
+                                <button id="preview-toggle-btn" class="btn btn-small btn-secondary">Preview</button>
+                                <button id="save-note-btn" class="btn btn-small btn-primary">Save</button>
+                            </div>
+                        </div>
+                        <textarea id="note-editor" class="textarea textarea-large" placeholder="Write your notes here... (Markdown supported)"></textarea>
+                        <div id="note-preview" class="hidden"></div>
+
+                    </div>
+
+                    <div class="event-actions">
+                        <button id="delete-event-btn" class="btn btn-danger btn-block">Delete Event</button>
+                    </div>
+                </section>
+
+                <!-- Settings Screen -->
+                <section id="screen-settings" class="screen">
+                    <div class="settings-section">
+                        <h2>Calendar Sync</h2>
+                        <p id="sync-status">Not yet synced</p>
+                        <button id="settings-sync-btn" class="btn btn-primary btn-block">Sync Now</button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2>Data</h2>
+                        <button id="export-data-btn" class="btn btn-outline btn-block">Export Backup (JSON)</button>
+                        <label class="btn btn-secondary btn-block file-input-label" style="margin-top: 8px;">
+                            Import Backup
+                            <input type="file" id="import-data-input" accept=".json" class="hidden">
+                        </label>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2>Account</h2>
+                        <p id="user-email" class="user-email"></p>
+                        <button id="logout-btn" class="btn btn-secondary btn-block">Sign Out</button>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Bottom Navigation -->
+            <nav class="bottom-nav">
+                <a href="#schedule" class="nav-item active" data-screen="schedule">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+                    </svg>
+                    <span>Schedule</span>
+                </a>
+                <a href="#settings" class="nav-item" data-screen="settings">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                    </svg>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <!-- Add Event Modal -->
+            <div id="add-modal-overlay" class="modal-overlay hidden">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Add Event</h2>
+                        <button id="add-modal-close" class="btn btn-icon" aria-label="Close">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="event-paste-input">Paste event details</label>
+                            <textarea id="event-paste-input" class="textarea textarea-large" placeholder="Paste session info from conference schedule..."></textarea>
+                        </div>
+                        <button id="parse-event-btn" class="btn btn-secondary btn-block">Parse</button>
+
+                        <div id="parsed-preview" class="parsed-preview hidden">
+                            <h3>Preview (edit if needed)</h3>
+                            <div class="form-group">
+                                <label for="parsed-title">Title</label>
+                                <input type="text" id="parsed-title" class="input">
+                            </div>
+                            <div class="form-group">
+                                <label for="parsed-datetime">Date/Time</label>
+                                <input type="text" id="parsed-datetime" class="input" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="parsed-location">Location</label>
+                                <input type="text" id="parsed-location" class="input">
+                            </div>
+                            <div class="form-group">
+                                <label for="parsed-description">Description</label>
+                                <textarea id="parsed-description" class="textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="save-event-btn" class="btn btn-primary">Save Event</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirm Modal -->
+            <div id="confirm-overlay" class="modal-overlay hidden">
+                <div class="modal" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h2 id="confirm-title">Confirm</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p id="confirm-message">Are you sure?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="confirm-cancel-btn" class="btn btn-secondary">Cancel</button>
+                        <button id="confirm-ok-btn" class="btn btn-danger">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/firebase.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/ui/schedule.js"></script>
+    <script src="js/ui/event.js"></script>
+    <script src="js/ui/settings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
