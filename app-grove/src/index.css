@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* ── Light theme (default) ── */
+:root {
+  --page: #f8fafc;
+  --card: #ffffff;
+  --section-header: #e8e0ed;
+  --section-border: #d5cbdd;
+  --primary: #584d64;
+  --primary-hover: #483e58;
+  --heading: #4a3f52;
+  --body: #1f2937;
+  --secondary: #453a4f;
+  --muted: #4b415c;
+  --icon: #4e4460;
+  --focus: #c4b5cf;
+  --border: #e5e7eb;
+  --hover: #f4f0f7;
+  --on-primary: #ffffff;
+  --on-reminder: #ffffff;
+  --reminder: #fff1f2;
+  --reminder-border: #fecdd3;
+  --reminder-text: #9f1239;
+  --reminder-body: #881337;
+}
+
+/* ── Dark theme ── */
+html.dark {
+  --page: #1a161f;
+  --card: #252130;
+  --section-header: #302a3a;
+  --section-border: #3f3750;
+  --primary: #ccc0d8;
+  --primary-hover: #dacfe2;
+  --heading: #e2dae8;
+  --body: #ccc4d4;
+  --secondary: #b5adc0;
+  --muted: #c2b7d0;
+  --icon: #c0b5ce;
+  --focus: #5e5270;
+  --border: #362f42;
+  --hover: #302a3a;
+  --on-primary: #1a161f;
+  --on-reminder: #2c1f23;
+  --reminder: #2c1f23;
+  --reminder-border: #4a2f35;
+  --reminder-text: #e8a0a8;
+  --reminder-body: #eca8b0;
+}
+
+/* ── Tailwind v4 theme tokens ── */
+@theme {
+  --color-page: var(--page);
+  --color-card: var(--card);
+  --color-section-header: var(--section-header);
+  --color-section-border: var(--section-border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-heading: var(--heading);
+  --color-body: var(--body);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-icon: var(--icon);
+  --color-focus: var(--focus);
+  --color-border: var(--border);
+  --color-hover: var(--hover);
+  --color-on-primary: var(--on-primary);
+  --color-on-reminder: var(--on-reminder);
+  --color-reminder: var(--reminder);
+  --color-reminder-border: var(--reminder-border);
+  --color-reminder-text: var(--reminder-text);
+  --color-reminder-body: var(--reminder-body);
+}
+
+html {
+  font-size: 20px;
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Dark dialog styling ── */
+html.dark dialog {
+  background-color: var(--card);
+  color: var(--body);
+}
+
+html.dark input,
+html.dark select {
+  background-color: var(--card);
+  color: var(--body);
+}

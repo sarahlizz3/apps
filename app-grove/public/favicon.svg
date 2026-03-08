@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#7c6f82"/>
+  <!-- Row 1: checked -->
+  <rect x="120" y="128" width="32" height="32" rx="6" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3"/>
+  <path d="M126 145 L133 153 L148 135" fill="none" stroke="#c4b5cf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="176" y="135" width="200" height="18" rx="9" fill="rgba(255,255,255,0.85)"/>
+  <!-- Row 2: checked -->
+  <rect x="120" y="208" width="32" height="32" rx="6" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3"/>
+  <path d="M126 225 L133 233 L148 215" fill="none" stroke="#c4b5cf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="176" y="215" width="160" height="18" rx="9" fill="rgba(255,255,255,0.85)"/>
+  <!-- Row 3: unchecked -->
+  <rect x="120" y="288" width="32" height="32" rx="6" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3"/>
+  <rect x="176" y="295" width="220" height="18" rx="9" fill="rgba(255,255,255,0.5)"/>
+  <!-- Row 4: unchecked -->
+  <rect x="120" y="368" width="32" height="32" rx="6" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3"/>
+  <rect x="176" y="375" width="140" height="18" rx="9" fill="rgba(255,255,255,0.5)"/>
+</svg>
