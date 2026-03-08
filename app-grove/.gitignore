@@ -13,8 +13,7 @@ dist-ssr
 .env
 
 # Firebase service account keys (migration)
-scripts/*-service-account.json
-scripts/*-export.json
+scripts/*.json
 
 # Editor directories and files
 .vscode/*

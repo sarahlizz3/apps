@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 // Each Firebase project assigns its own UID to the same Google account
 const HEALTH_UID = 'PfJ8DO4hJ9flpUWxvavbuvg2RoG3';
 const PACKING_UID = 'RHZFw1yQzAUx6PuYdFUzJGflKqv2';
-const APPGROVE_UID = 'RHZFw1yQzAUx6PuYdFUzJGflKqv2'; // Will be set after first sign-in
+const APPGROVE_UID = 'NwKIDbdAHRNXxZ926uhC47ofP4t1';
 
 const HEALTH_COLLECTIONS = ['medications', 'diagnoses', 'providers', 'explainers', 'notes'];
 const PACKING_COLLECTIONS = ['tripLists', 'templatePackingLists', 'templateSections', 'reminderTemplates'];

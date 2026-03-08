@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth, AUTHORIZED_UID as _AUTHORIZED_UID } from './firebase';
-void _AUTHORIZED_UID;
+import { auth, AUTHORIZED_UID } from './firebase';
 import { handleRedirectResult } from './auth';
 
 interface AuthContextValue {
@@ -24,10 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // TODO: re-enable UID check after discovering AppGrove UID
-  // const authorized = user != null && user.uid === AUTHORIZED_UID;
-  const authorized = user != null;
-  if (user) console.log('AppGrove UID:', user.uid);
+  const authorized = user != null && user.uid === AUTHORIZED_UID;
 
   return (
     <AuthContext.Provider value={{ user, loading, authorized }}>
