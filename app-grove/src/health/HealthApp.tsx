@@ -78,21 +78,23 @@ export default function HealthApp() {
         </header>
 
         {/* Tab Navigation */}
-        <nav className="relative z-20 bg-card border-b border-border px-2 flex items-center gap-1 overflow-x-auto shrink-0">
-          {prioritySections.map(s => (
-            <button
-              key={s.key}
-              onClick={() => { setActiveSection(s.key); setNewNoteFromHome(false); }}
-              className={`px-3 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 ${
-                activeSection === s.key
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-secondary hover:text-body'
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
-          <div className="relative ml-auto">
+        <nav className="relative z-20 bg-card border-b border-border px-2 flex items-center shrink-0">
+          <div className="flex items-center gap-1 overflow-x-auto flex-1 min-w-0">
+            {prioritySections.map(s => (
+              <button
+                key={s.key}
+                onClick={() => { setActiveSection(s.key); setNewNoteFromHome(false); }}
+                className={`px-3 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 ${
+                  activeSection === s.key
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-secondary hover:text-body'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <div className="relative shrink-0">
             <button
               onClick={() => setMoreOpen(!moreOpen)}
               className={`px-3 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 ${
