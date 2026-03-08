@@ -7,7 +7,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../shared/firebase';
-import type { Recipe } from './types';
+
 
 function recipesCol(userId: string) {
   return collection(db, 'users', userId, 'recipes');
@@ -19,7 +19,7 @@ function recipeDoc(userId: string, recipeId: string) {
 
 export async function createRecipe(
   userId: string,
-  data: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>,
+  data: Record<string, unknown>,
 ) {
   const ref = doc(recipesCol(userId));
   await setDoc(ref, {
@@ -33,7 +33,7 @@ export async function createRecipe(
 export async function updateRecipe(
   userId: string,
   recipeId: string,
-  data: Partial<Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>>,
+  data: Record<string, unknown>,
 ) {
   await updateDoc(recipeDoc(userId, recipeId), {
     ...data,

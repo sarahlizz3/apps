@@ -92,19 +92,19 @@ export default function RecipeForm() {
       .map((l) => l.trim())
       .filter(Boolean);
 
-    const data = {
+    const data: Record<string, unknown> = {
       title: title.trim(),
       ingredients,
       directions,
-      prepTime: prepTime.trim() || undefined,
-      cookTime: cookTime.trim() || undefined,
-      servings: servings.trim() || undefined,
-      imageUrl: imageUrl.trim() || undefined,
-      sourceUrl: sourceUrl.trim() || undefined,
       category: category.trim() || DEFAULT_CATEGORY,
       difficulty,
-      notes: notes.trim() || undefined,
     };
+    if (prepTime.trim()) data.prepTime = prepTime.trim();
+    if (cookTime.trim()) data.cookTime = cookTime.trim();
+    if (servings.trim()) data.servings = servings.trim();
+    if (imageUrl.trim()) data.imageUrl = imageUrl.trim();
+    if (sourceUrl.trim()) data.sourceUrl = sourceUrl.trim();
+    if (notes.trim()) data.notes = notes.trim();
 
     try {
       if (isEdit && recipeId) {
