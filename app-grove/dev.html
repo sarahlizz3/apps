@@ -12,6 +12,14 @@
     <script>
       // Apply saved theme before first paint to prevent flash
       if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark');
+      // SPA redirect: restore path saved by 404.html
+      (function() {
+        var redirect = sessionStorage.getItem('spa-redirect');
+        if (redirect) {
+          sessionStorage.removeItem('spa-redirect');
+          history.replaceState(null, '', redirect);
+        }
+      })();
     </script>
   </head>
   <body>

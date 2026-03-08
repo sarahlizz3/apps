@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    // SPA redirect for GitHub Pages
+    // Preserves the path so React Router can handle it
+    var path = window.location.pathname;
+    // Only redirect for app-grove SPA routes
+    if (path.indexOf('/app-grove') === 0) {
+      sessionStorage.setItem('spa-redirect', path + window.location.search + window.location.hash);
+      window.location.replace('/app-grove/');
+    }
+  </script>
+  <title>Not Found</title>
+</head>
+<body>
+  <p>Page not found. <a href="/">Go home</a></p>
+</body>
+</html>
