@@ -16,6 +16,9 @@ import PackingListTemplateEditor from './packing/components/templates/PackingLis
 // Health app
 import HealthApp from './health/HealthApp';
 
+// Recipe app
+import RecipeApp from './recipes/components/RecipeApp';
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -40,6 +43,9 @@ export default function App() {
 
                     {/* Health Dashboard */}
                     <Route path="/health/*" element={<HealthApp />} />
+
+                    {/* Recipes */}
+                    <Route path="/recipes/*" element={<RecipeApp />} />
                   </Routes>
                 </ProtectedRoute>
               }

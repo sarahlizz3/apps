@@ -24,6 +24,7 @@
   --reminder-body: #a01840;
   --accent-packing: #00c9a7;
   --accent-health: #f0548c;
+  --accent-recipes: #f59e0b;
   --glow-1: rgba(155, 93, 229, 0.12);
   --glow-2: rgba(0, 201, 167, 0.10);
   --glow-3: rgba(240, 84, 140, 0.10);
@@ -53,6 +54,7 @@ html.dark {
   --reminder-body: #e890a8;
   --accent-packing: #40c8a8;
   --accent-health: #f07890;
+  --accent-recipes: #fbbf24;
   --glow-1: rgba(140, 80, 220, 0.18);
   --glow-2: rgba(64, 200, 168, 0.12);
   --glow-3: rgba(240, 120, 144, 0.14);
@@ -82,6 +84,7 @@ html.dark {
   --color-reminder-body: var(--reminder-body);
   --color-accent-packing: var(--accent-packing);
   --color-accent-health: var(--accent-health);
+  --color-accent-recipes: var(--accent-recipes);
   --font-display: 'Bricolage Grotesque', sans-serif;
 }
 
