@@ -9,6 +9,7 @@ const empty: HealthData = {
   providers: [],
   explainers: [],
   notes: [],
+  todos: [],
 };
 
 export function useHealthData() {

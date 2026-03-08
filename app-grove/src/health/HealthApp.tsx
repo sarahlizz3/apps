@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../shared/ThemeContext';
 import { useHealthData } from './useHealthData';
 import { ToastProvider } from './components/Toast';
+import HomeSection from './components/HomeSection';
 import MedicationsSection from './components/MedicationsSection';
 import DiagnosesSection from './components/DiagnosesSection';
 import ProvidersSection from './components/ProvidersSection';
@@ -13,13 +14,14 @@ import PrintSection from './components/PrintSection';
 import ImportSection from './components/ImportSection';
 
 const SECTIONS = [
+  { key: 'home', label: 'Home', priority: true },
   { key: 'medications', label: 'Meds', priority: true },
   { key: 'diagnoses', label: 'Diagnoses', priority: true },
   { key: 'providers', label: 'Providers', priority: true },
-  { key: 'explainers', label: 'Explainers', priority: false },
   { key: 'notes', label: 'Notes', priority: false },
+  { key: 'explainers', label: 'Explainers', priority: false },
   { key: 'forminfo', label: 'Form Info', priority: false },
-  { key: 'print', label: 'Print/Export', priority: false },
+  { key: 'print', label: 'Export', priority: false },
   { key: 'import', label: 'Import', priority: false },
 ] as const;
 
@@ -28,8 +30,9 @@ type SectionKey = (typeof SECTIONS)[number]['key'];
 export default function HealthApp() {
   const { dark, toggleTheme } = useTheme();
   const { data, setData, loading, reload } = useHealthData();
-  const [activeSection, setActiveSection] = useState<SectionKey>('medications');
+  const [activeSection, setActiveSection] = useState<SectionKey>('home');
   const [moreOpen, setMoreOpen] = useState(false);
+  const [newNoteFromHome, setNewNoteFromHome] = useState(false);
 
   const prioritySections = SECTIONS.filter(s => s.priority);
   const moreSections = SECTIONS.filter(s => !s.priority);
@@ -41,6 +44,11 @@ export default function HealthApp() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
+  }
+
+  function goToNotes(startNew?: boolean) {
+    setNewNoteFromHome(!!startNew);
+    setActiveSection('notes');
   }
 
   return (
@@ -70,11 +78,11 @@ export default function HealthApp() {
         </header>
 
         {/* Tab Navigation */}
-        <nav className="bg-card border-b border-border px-2 flex items-center gap-1 overflow-x-auto shrink-0">
+        <nav className="relative z-20 bg-card border-b border-border px-2 flex items-center gap-1 overflow-x-auto shrink-0">
           {prioritySections.map(s => (
             <button
               key={s.key}
-              onClick={() => setActiveSection(s.key)}
+              onClick={() => { setActiveSection(s.key); setNewNoteFromHome(false); }}
               className={`px-3 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 ${
                 activeSection === s.key
                   ? 'border-primary text-primary'
@@ -84,7 +92,7 @@ export default function HealthApp() {
               {s.label}
             </button>
           ))}
-          <div className="relative">
+          <div className="relative ml-auto">
             <button
               onClick={() => setMoreOpen(!moreOpen)}
               className={`px-3 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 ${
@@ -100,7 +108,7 @@ export default function HealthApp() {
                   {moreSections.map(s => (
                     <button
                       key={s.key}
-                      onClick={() => { setActiveSection(s.key); setMoreOpen(false); }}
+                      onClick={() => { setActiveSection(s.key); setMoreOpen(false); setNewNoteFromHome(false); }}
                       className={`block w-full text-left px-4 py-2 text-xs font-medium transition-colors ${
                         activeSection === s.key ? 'text-primary bg-hover' : 'text-secondary hover:bg-hover'
                       }`}
@@ -117,11 +125,12 @@ export default function HealthApp() {
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-4">
           <div className="max-w-2xl mx-auto">
+            {activeSection === 'home' && <HomeSection data={data} setData={setData} onGoToNotes={() => goToNotes(true)} />}
             {activeSection === 'medications' && <MedicationsSection data={data} setData={setData} />}
             {activeSection === 'diagnoses' && <DiagnosesSection data={data} setData={setData} />}
             {activeSection === 'providers' && <ProvidersSection data={data} setData={setData} />}
             {activeSection === 'explainers' && <ExplainersSection data={data} setData={setData} />}
-            {activeSection === 'notes' && <NotesSection data={data} setData={setData} />}
+            {activeSection === 'notes' && <NotesSection data={data} setData={setData} initialNewNote={newNoteFromHome} />}
             {activeSection === 'forminfo' && <FormInfoSection data={data} />}
             {activeSection === 'print' && <PrintSection data={data} />}
             {activeSection === 'import' && <ImportSection onImported={reload} />}

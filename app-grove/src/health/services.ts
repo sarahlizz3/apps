@@ -24,12 +24,13 @@ function userDocRef(uid: string) {
 }
 
 export async function loadAllData(uid: string): Promise<HealthData> {
-  const [meds, diags, provs, exps, notes] = await Promise.all([
+  const [meds, diags, provs, exps, notes, todos] = await Promise.all([
     getDocs(query(userCol(uid, 'medications'), orderBy('name'))),
     getDocs(query(userCol(uid, 'diagnoses'), orderBy('name'))),
     getDocs(query(userCol(uid, 'providers'), orderBy('name'))),
     getDocs(query(userCol(uid, 'explainers'), orderBy('title'))),
     getDocs(query(userCol(uid, 'notes'), orderBy('timestamp', 'desc'))),
+    getDocs(query(userCol(uid, 'todos'), orderBy('createdAt', 'desc'))).catch(() => ({ docs: [] })),
   ]);
 
   return {
@@ -38,6 +39,7 @@ export async function loadAllData(uid: string): Promise<HealthData> {
     providers: provs.docs.map(d => ({ id: d.id, ...d.data() } as HealthData['providers'][0])),
     explainers: exps.docs.map(d => ({ id: d.id, ...d.data() } as HealthData['explainers'][0])),
     notes: notes.docs.map(d => ({ id: d.id, ...d.data() } as HealthData['notes'][0])),
+    todos: todos.docs.map(d => ({ id: d.id, ...d.data() } as HealthData['todos'][0])),
   };
 }
 

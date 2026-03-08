@@ -56,8 +56,23 @@ export interface Explainer {
 export interface Note {
   id: string;
   providerId: string;
+  providerNameOverride?: string;
   text: string;
   timestamp?: Timestamp | { seconds: number };
+  updatedAt?: Timestamp | { seconds: number };
+}
+
+export interface TodoItem {
+  id: string;
+  title: string;
+  recurrence: {
+    type: 'yearly' | 'monthly' | 'once';
+    month?: number;
+    day?: number;
+  } | null;
+  completed: boolean;
+  completedAt?: Timestamp | { seconds: number };
+  createdAt?: Timestamp | { seconds: number };
 }
 
 export interface PatientInfo {
@@ -79,6 +94,7 @@ export interface HealthData {
   providers: Provider[];
   explainers: Explainer[];
   notes: Note[];
+  todos: TodoItem[];
 }
 
 export const CONCERN_TAGS = [

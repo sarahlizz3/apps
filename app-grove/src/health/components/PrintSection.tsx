@@ -1,10 +1,24 @@
 import { useState, useEffect } from 'react';
-import type { HealthData } from '../types';
+import type { HealthData, Note } from '../types';
 import { MED_COLUMNS } from '../types';
 import { useToast } from './Toast';
 
 interface Props {
   data: HealthData;
+}
+
+function downloadFile(content: string, filename: string, type: string) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function getNoteTimestamp(n: Note): number {
+  const ts = n.updatedAt || n.timestamp;
+  if (!ts || typeof ts !== 'object' || !('seconds' in ts)) return 0;
+  return ts.seconds * 1000;
 }
 
 export default function PrintSection({ data }: Props) {
@@ -15,6 +29,9 @@ export default function PrintSection({ data }: Props) {
   const [includeNotes, setIncludeNotes] = useState(true);
   const [selectedCols, setSelectedCols] = useState<string[]>([]);
   const [selectedExplainers, setSelectedExplainers] = useState<string[]>([]);
+  const [noteExportStart, setNoteExportStart] = useState('');
+  const [noteExportEnd, setNoteExportEnd] = useState('');
+  const [singleNoteId, setSingleNoteId] = useState('');
 
   const optionalCols = MED_COLUMNS.filter(c => !c.alwaysShow);
   const provider = data.providers.find(p => p.id === provId);
@@ -122,11 +139,7 @@ ${subtitle ? `<div class="subtitle">${subtitle}</div>` : ''}
     html += `<div class="footer">Patient Health Overview \u2014 Generated ${today} \u2014 Confidential</div></body></html>`;
 
     const filename = `${provider.name.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}.html`;
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename; document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
+    downloadFile(html, filename, 'text/html');
     showToast('Printout generated!');
   }
 
@@ -153,12 +166,7 @@ ${subtitle ? `<div class="subtitle">${subtitle}</div>` : ''}
     data.explainers.forEach(e => { md += `### ${e.title} (${e.type})\n\n${e.content}\n\n`; });
     md += `---\n\n*End of export*\n`;
 
-    const filename = `health_export_${new Date().toISOString().slice(0, 10)}.md`;
-    const blob = new Blob([md], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename; document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
+    downloadFile(md, `health_export_${new Date().toISOString().slice(0, 10)}.md`, 'text/markdown');
     showToast('Export generated!');
   }
 
@@ -187,13 +195,74 @@ ${subtitle ? `<div class="subtitle">${subtitle}</div>` : ''}
       notes: clean(data.notes as unknown as Record<string, unknown>[]),
     };
 
-    const filename = `health_backup_${new Date().toISOString().slice(0, 10)}.json`;
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename; document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
+    downloadFile(JSON.stringify(exportData, null, 2), `health_backup_${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
     showToast('JSON backup downloaded!');
+  }
+
+  function formatNoteForExport(n: Note): string {
+    const provName = n.providerId === '__other'
+      ? (n.providerNameOverride || 'Other')
+      : (data.providers.find(p => p.id === n.providerId)?.name || 'Unknown');
+    const date = getNoteTimestamp(n) ? new Date(getNoteTimestamp(n)).toLocaleString() : 'No date';
+    return `## ${provName} — ${date}\n\n${n.text}\n\n---\n\n`;
+  }
+
+  function exportAllDoctorInfo() {
+    let md = `# All Provider Information\n\n**Exported:** ${new Date().toLocaleDateString()}\n\n---\n\n`;
+    data.providers.forEach(p => {
+      md += `## ${p.name}\n\n`;
+      if (p.role) md += `**Role:** ${p.role}\n\n`;
+      if (p.practice) md += `**Practice:** ${p.practice}\n\n`;
+      if (p.address) md += `**Address:** ${p.address}\n\n`;
+      if (p.phone) md += `**Phone:** ${p.phone}\n\n`;
+      if (p.fax) md += `**Fax:** ${p.fax}\n\n`;
+      if (p.executiveSummary) md += `**Summary:** ${p.executiveSummary}\n\n`;
+      if (p.notes) md += `**Notes:** ${p.notes}\n\n`;
+      if ((p.concernTags || []).length) md += `**Tags:** ${p.concernTags.join(', ')}\n\n`;
+      md += `---\n\n`;
+    });
+    downloadFile(md, `providers_${new Date().toISOString().slice(0, 10)}.md`, 'text/markdown');
+    showToast('Provider info exported!');
+  }
+
+  function exportAllNotes() {
+    let md = `# All Notes\n\n**Exported:** ${new Date().toLocaleDateString()}\n\n---\n\n`;
+    data.notes.forEach(n => { md += formatNoteForExport(n); });
+    downloadFile(md, `all_notes_${new Date().toISOString().slice(0, 10)}.md`, 'text/markdown');
+    showToast('All notes exported!');
+  }
+
+  function exportNotesByDate() {
+    if (!noteExportStart || !noteExportEnd) {
+      showToast('Please select start and end dates.', true);
+      return;
+    }
+    const startMs = new Date(noteExportStart).getTime();
+    const endMs = new Date(noteExportEnd + 'T23:59:59').getTime();
+    const filtered = data.notes.filter(n => {
+      const ts = getNoteTimestamp(n);
+      return ts >= startMs && ts <= endMs;
+    });
+    if (filtered.length === 0) {
+      showToast('No notes found in that date range.', true);
+      return;
+    }
+    let md = `# Notes: ${noteExportStart} to ${noteExportEnd}\n\n---\n\n`;
+    filtered.forEach(n => { md += formatNoteForExport(n); });
+    downloadFile(md, `notes_${noteExportStart}_to_${noteExportEnd}.md`, 'text/markdown');
+    showToast(`Exported ${filtered.length} note(s)!`);
+  }
+
+  function exportSingleNote() {
+    const note = data.notes.find(n => n.id === singleNoteId);
+    if (!note) {
+      showToast('Please select a note.', true);
+      return;
+    }
+    const md = formatNoteForExport(note);
+    const date = getNoteTimestamp(note) ? new Date(getNoteTimestamp(note)).toISOString().slice(0, 10) : 'undated';
+    downloadFile(md, `note_${date}.md`, 'text/markdown');
+    showToast('Note exported!');
   }
 
   const chipCls = (active: boolean) =>
@@ -244,12 +313,55 @@ ${subtitle ? `<div class="subtitle">${subtitle}</div>` : ''}
 
       {/* Export Buttons */}
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-heading mb-3">Export</h3>
+        <h3 className="text-sm font-semibold text-heading mb-3">Data Export</h3>
+        <button onClick={exportAllDoctorInfo} className="w-full bg-card border border-border text-secondary py-2 rounded-lg text-sm font-medium hover:bg-hover transition-colors">
+          Export All Doctor Info
+        </button>
+        <button onClick={exportAllNotes} className="w-full bg-card border border-border text-secondary py-2 rounded-lg text-sm font-medium hover:bg-hover transition-colors">
+          Export All Notes
+        </button>
         <button onClick={generateClaudeExport} className="w-full bg-card border border-border text-secondary py-2 rounded-lg text-sm font-medium hover:bg-hover transition-colors">
           Claude Export (Markdown)
         </button>
         <button onClick={exportJSON} className="w-full bg-card border border-border text-secondary py-2 rounded-lg text-sm font-medium hover:bg-hover transition-colors">
           JSON Backup
+        </button>
+      </div>
+
+      {/* Notes Export by Date */}
+      <div>
+        <h3 className="text-sm font-semibold text-heading mb-3">Export Notes by Date Range</h3>
+        <div className="flex gap-2 mb-3">
+          <div className="flex-1">
+            <label className="block text-xs text-secondary mb-1">From</label>
+            <input type="date" value={noteExportStart} onChange={e => setNoteExportStart(e.target.value)} className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
+          </div>
+          <div className="flex-1">
+            <label className="block text-xs text-secondary mb-1">To</label>
+            <input type="date" value={noteExportEnd} onChange={e => setNoteExportEnd(e.target.value)} className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
+          </div>
+        </div>
+        <button onClick={exportNotesByDate} className="w-full bg-card border border-border text-secondary py-2 rounded-lg text-sm font-medium hover:bg-hover transition-colors">
+          Export Notes in Range
+        </button>
+      </div>
+
+      {/* Export Single Note */}
+      <div>
+        <h3 className="text-sm font-semibold text-heading mb-3">Export Individual Note</h3>
+        <select value={singleNoteId} onChange={e => setSingleNoteId(e.target.value)} className="w-full rounded-lg border border-border px-3 py-2 text-sm mb-3">
+          <option value="">Select a note...</option>
+          {data.notes.map(n => {
+            const provName = n.providerId === '__other'
+              ? (n.providerNameOverride || 'Other')
+              : (data.providers.find(p => p.id === n.providerId)?.name || 'Unknown');
+            const date = getNoteTimestamp(n) ? new Date(getNoteTimestamp(n)).toLocaleDateString() : 'No date';
+            const preview = n.text.slice(0, 40) + (n.text.length > 40 ? '...' : '');
+            return <option key={n.id} value={n.id}>{date} — {provName}: {preview}</option>;
+          })}
+        </select>
+        <button onClick={exportSingleNote} className="w-full bg-card border border-border text-secondary py-2 rounded-lg text-sm font-medium hover:bg-hover transition-colors">
+          Export Selected Note
         </button>
       </div>
     </div>
