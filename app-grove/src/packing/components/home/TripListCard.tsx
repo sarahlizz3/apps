@@ -10,7 +10,7 @@ export default function TripListCard({ trip }: Props) {
 
   return (
     <Link
-      to={`/trip/${trip.id}`}
+      to={`/packing/trip/${trip.id}`}
       className="block bg-card rounded-xl border border-border p-4 hover:border-section-border hover:bg-hover/40 transition-colors"
     >
       <div className="flex items-center justify-between">
