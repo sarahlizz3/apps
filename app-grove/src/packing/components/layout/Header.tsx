@@ -12,7 +12,7 @@ export default function Header() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
           </svg>
         </Link>
-        <h1 className="text-lg font-semibold">Packing List</h1>
+        <h1 className="text-lg font-semibold font-display">Packing List</h1>
       </div>
       <button
         onClick={toggleTheme}

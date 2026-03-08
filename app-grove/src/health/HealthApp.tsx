@@ -54,7 +54,7 @@ export default function HealthApp() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
               </svg>
             </Link>
-            <h1 className="text-lg font-semibold">Health Dashboard</h1>
+            <h1 className="text-lg font-semibold font-display">Health Dashboard</h1>
           </div>
           <button onClick={toggleTheme} className="text-primary-hover hover:text-heading transition-colors p-1" aria-label="Toggle theme">
             {dark ? (

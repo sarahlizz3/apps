@@ -12,6 +12,8 @@ export default function LauncherPage() {
       name: 'Packing List',
       description: 'Plan your trips, never forget a thing',
       path: '/packing',
+      iconBg: 'bg-accent-packing/15',
+      iconColor: 'text-accent-packing',
       icon: (
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
@@ -22,6 +24,8 @@ export default function LauncherPage() {
       name: 'Health Dashboard',
       description: 'Track medications, providers, and health info',
       path: '/health',
+      iconBg: 'bg-accent-health/15',
+      iconColor: 'text-accent-health',
       icon: (
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
@@ -33,7 +37,7 @@ export default function LauncherPage() {
   return (
     <div className="flex flex-col h-full bg-page">
       <header className="bg-section-header text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0 border-b border-section-border">
-        <h1 className="text-lg font-semibold">AppGrove</h1>
+        <h1 className="text-xl font-bold font-display">AppGrove</h1>
         <div className="flex items-center gap-3">
           <button
             onClick={toggleTheme}
@@ -62,19 +66,24 @@ export default function LauncherPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-md mx-auto space-y-3 mt-4">
+        <div className="max-w-md mx-auto space-y-4 mt-6">
+          <p className="text-center text-muted text-sm">Your apps, one place.</p>
           {apps.map((app) => (
             <Link
               key={app.path}
               to={app.path}
-              className="flex items-center gap-4 bg-card border border-border rounded-xl p-4 hover:bg-hover transition-colors"
+              className="group flex items-center gap-4 bg-card border border-border rounded-xl p-4 hover:bg-hover transition-colors"
             >
-              <div className="text-primary shrink-0">{app.icon}</div>
-              <div>
-                <h2 className="text-heading font-semibold">{app.name}</h2>
+              <div
+                className={`shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${app.iconColor} ${app.iconBg}`}
+              >
+                {app.icon}
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-heading font-semibold font-display">{app.name}</h2>
                 <p className="text-secondary text-sm">{app.description}</p>
               </div>
-              <svg className="w-5 h-5 text-muted ml-auto shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <svg className="w-5 h-5 text-muted ml-auto shrink-0 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
               </svg>
             </Link>

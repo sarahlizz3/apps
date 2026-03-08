@@ -49,7 +49,7 @@ export default function LoginPage() {
       </button>
 
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-center mb-2 text-heading">AppGrove</h1>
+        <h1 className="text-3xl font-bold text-center mb-2 text-heading font-display">AppGrove</h1>
         <p className="text-primary text-center mb-8">Personal utility apps</p>
 
         {user && !authorized && (

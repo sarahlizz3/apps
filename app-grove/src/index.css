@@ -1,51 +1,55 @@
 @import "tailwindcss";
 
-/* ── Light theme (default) ── */
+/* ── Light theme — pastel macaron palette ── */
 :root {
-  --page: #f8fafc;
+  --page: #fef6f0;
   --card: #ffffff;
-  --section-header: #e8e0ed;
-  --section-border: #d5cbdd;
-  --primary: #584d64;
-  --primary-hover: #483e58;
-  --heading: #4a3f52;
-  --body: #1f2937;
-  --secondary: #453a4f;
-  --muted: #4b415c;
-  --icon: #4e4460;
-  --focus: #c4b5cf;
-  --border: #e5e7eb;
-  --hover: #f4f0f7;
+  --section-header: #f5e6f0;
+  --section-border: #e8d5e0;
+  --primary: #b07aa8;
+  --primary-hover: #9a6494;
+  --heading: #6b4c6e;
+  --body: #4a3650;
+  --secondary: #7d6282;
+  --muted: #9a839e;
+  --icon: #b07aa8;
+  --focus: #dfc4db;
+  --border: #edd8e6;
+  --hover: #fdf0f5;
   --on-primary: #ffffff;
   --on-reminder: #ffffff;
-  --reminder: #fff1f2;
-  --reminder-border: #fecdd3;
-  --reminder-text: #9f1239;
-  --reminder-body: #881337;
+  --reminder: #fff0f3;
+  --reminder-border: #f9c4cf;
+  --reminder-text: #a83252;
+  --reminder-body: #8e2744;
+  --accent-packing: #a2d2c8;
+  --accent-health: #f5b0c4;
 }
 
-/* ── Dark theme ── */
+/* ── Dark theme — deep purple/violet with warm accents ── */
 html.dark {
-  --page: #1a161f;
-  --card: #252130;
-  --section-header: #302a3a;
-  --section-border: #3f3750;
-  --primary: #ccc0d8;
-  --primary-hover: #dacfe2;
-  --heading: #e2dae8;
-  --body: #ccc4d4;
-  --secondary: #b5adc0;
-  --muted: #c2b7d0;
-  --icon: #c0b5ce;
-  --focus: #5e5270;
-  --border: #362f42;
-  --hover: #302a3a;
-  --on-primary: #1a161f;
-  --on-reminder: #2c1f23;
-  --reminder: #2c1f23;
-  --reminder-border: #4a2f35;
-  --reminder-text: #e8a0a8;
-  --reminder-body: #eca8b0;
+  --page: #0f0b18;
+  --card: #1a1428;
+  --section-header: #1e1730;
+  --section-border: #2e2545;
+  --primary: #b8a0d8;
+  --primary-hover: #d0bef0;
+  --heading: #e8e0f0;
+  --body: #c8bfd8;
+  --secondary: #a89cc0;
+  --muted: #8a7ea8;
+  --icon: #b8a0d8;
+  --focus: #4a3870;
+  --border: #2a2040;
+  --hover: #241c38;
+  --on-primary: #0f0b18;
+  --on-reminder: #1a1020;
+  --reminder: #2a1525;
+  --reminder-border: #4a2538;
+  --reminder-text: #f0a0b8;
+  --reminder-body: #e890a8;
+  --accent-packing: #40c8a8;
+  --accent-health: #f07890;
 }
 
 /* ── Tailwind v4 theme tokens ── */
@@ -70,6 +74,9 @@ html.dark {
   --color-reminder-border: var(--reminder-border);
   --color-reminder-text: var(--reminder-text);
   --color-reminder-body: var(--reminder-body);
+  --color-accent-packing: var(--accent-packing);
+  --color-accent-health: var(--accent-health);
+  --font-display: 'Bricolage Grotesque', sans-serif;
 }
 
 html {
