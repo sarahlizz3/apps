@@ -4,7 +4,12 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/app-grove/dist/',
+  base: '/app-grove/',
+  build: {
+    rollupOptions: {
+      input: 'dev.html',
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -15,15 +20,15 @@ export default defineConfig({
         name: 'AppGrove',
         short_name: 'AppGrove',
         description: 'Personal utility apps hub',
-        theme_color: '#7c6f82',
-        background_color: '#ffffff',
+        theme_color: '#0f0b18',
+        background_color: '#0f0b18',
         display: 'standalone',
-        scope: '/app-grove/dist/',
-        start_url: '/app-grove/dist/',
+        scope: '/app-grove/',
+        start_url: '/app-grove/',
         icons: [
-          { src: '/app-grove/dist/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/app-grove/dist/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-          { src: '/app-grove/dist/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+          { src: '/app-grove/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/app-grove/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/app-grove/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
         ],
       },
       workbox: {

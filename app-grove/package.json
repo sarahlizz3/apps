@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && cp dist/index.html dist/404.html",
+    "build": "tsc -b && vite build && mv dist/dev.html dist/index.html && cp dist/index.html dist/404.html && cp -r dist/assets dist/*.html dist/*.js dist/*.webmanifest dist/*.svg dist/*.png . 2>/dev/null; cp dist/workbox-*.js . 2>/dev/null; true",
     "lint": "eslint .",
     "preview": "vite preview"
   },

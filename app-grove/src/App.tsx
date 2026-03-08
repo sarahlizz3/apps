@@ -20,7 +20,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter basename="/app-grove/dist">
+        <BrowserRouter basename="/app-grove">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route
