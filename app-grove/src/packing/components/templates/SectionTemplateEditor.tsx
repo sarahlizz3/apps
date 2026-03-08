@@ -12,6 +12,7 @@ export default function SectionTemplateEditor() {
   const { section, loading } = useTemplateSection(sectionId);
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState('');
+  const [itemReorder, setItemReorder] = useState(false);
 
   if (loading) {
     return (
@@ -53,6 +54,14 @@ export default function SectionTemplateEditor() {
     updateTemplateSection(user.uid, section.id, {
       items: section.items.map((item, i) => (i === index ? newName : item)),
     });
+  }
+
+  function moveItem(fromIndex: number, toIndex: number) {
+    if (!user || !section || toIndex < 0 || toIndex >= section.items.length) return;
+    const items = [...section.items];
+    const [moved] = items.splice(fromIndex, 1);
+    items.splice(toIndex, 0, moved);
+    updateTemplateSection(user.uid, section.id, { items });
   }
 
   return (
@@ -97,16 +106,43 @@ export default function SectionTemplateEditor() {
       </div>
 
       <div className="bg-card rounded-xl border border-border p-4">
+        {section.items.length > 1 && (
+          <div className="flex justify-end mb-2">
+            <button
+              onClick={() => setItemReorder(!itemReorder)}
+              className={`text-xs ${itemReorder ? 'text-primary font-medium' : 'text-muted hover:text-primary'}`}
+            >
+              {itemReorder ? 'Done' : 'Reorder'}
+            </button>
+          </div>
+        )}
         {section.items.length === 0 && (
           <p className="text-secondary text-sm mb-3">No items yet. Add some below.</p>
         )}
         {section.items.map((item, index) => (
-          <TemplateItem
-            key={index}
-            name={item}
-            onDelete={() => removeItem(index)}
-            onRename={(newName) => renameItem(index, newName)}
-          />
+          <div key={index} className="flex items-center gap-1">
+            {itemReorder && (
+              <div className="flex flex-col gap-0.5 shrink-0">
+                <button onClick={() => moveItem(index, index - 1)} disabled={index === 0} className="text-muted disabled:opacity-20 hover:text-primary p-0.5">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                  </svg>
+                </button>
+                <button onClick={() => moveItem(index, index + 1)} disabled={index === section.items.length - 1} className="text-muted disabled:opacity-20 hover:text-primary p-0.5">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            <div className="flex-1">
+              <TemplateItem
+                name={item}
+                onDelete={() => removeItem(index)}
+                onRename={(newName) => renameItem(index, newName)}
+              />
+            </div>
+          </div>
         ))}
         <div className="mt-2">
           <InlineAdd placeholder="Add item..." onAdd={addItem} />

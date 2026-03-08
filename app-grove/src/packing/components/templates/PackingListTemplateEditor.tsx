@@ -8,7 +8,7 @@ import type { TemplatePLSection } from '../../types';
 import InlineAdd from '../ui/InlineAdd';
 import TemplateItem from './TemplateItem';
 import ImportDialog from '../trip/ImportDialog';
-import { sortSections } from '../../utils/sortSections';
+
 
 export default function PackingListTemplateEditor() {
   const { templateId } = useParams<{ templateId: string }>();
@@ -18,6 +18,8 @@ export default function PackingListTemplateEditor() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState('');
   const [importOpen, setImportOpen] = useState(false);
+  const [sectionReorder, setSectionReorder] = useState(false);
+  const [itemReorderSection, setItemReorderSection] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -86,6 +88,31 @@ export default function PackingListTemplateEditor() {
     );
   }
 
+  function moveSectionBy(fromIndex: number, direction: number) {
+    if (!template) return;
+    const toIndex = fromIndex + direction;
+    if (toIndex < 0 || toIndex >= template.sections.length) return;
+    const sections = [...template.sections];
+    const [moved] = sections.splice(fromIndex, 1);
+    sections.splice(toIndex, 0, moved);
+    updateSections(sections);
+  }
+
+  function moveItemInSection(sectionId: string, fromIndex: number, toIndex: number) {
+    if (!template) return;
+    const section = template.sections.find((s) => s.id === sectionId);
+    if (!section || toIndex < 0 || toIndex >= section.items.length) return;
+    updateSections(
+      template.sections.map((s) => {
+        if (s.id !== sectionId) return s;
+        const items = [...s.items];
+        const [moved] = items.splice(fromIndex, 1);
+        items.splice(toIndex, 0, moved);
+        return { ...s, items };
+      }),
+    );
+  }
+
   function handleImportSections(ids: string[]) {
     if (ids.length === 0) return;
     const selected = templateSections.filter((s) => ids.includes(s.id));
@@ -127,10 +154,34 @@ export default function PackingListTemplateEditor() {
         )}
       </div>
 
+      {template.sections.length > 1 && (
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={() => setSectionReorder(!sectionReorder)}
+            className={`text-sm ${sectionReorder ? 'text-primary font-medium' : 'text-secondary hover:text-primary'}`}
+          >
+            {sectionReorder ? 'Done reordering' : 'Reorder sections'}
+          </button>
+        </div>
+      )}
       <div className="space-y-4">
-        {sortSections(template.sections).map((section) => (
+        {template.sections.map((section, sectionIndex) => (
           <div key={section.id} className="bg-card rounded-xl border border-section-border overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 bg-section-header border-b border-section-border">
+              {sectionReorder ? (
+                <div className="flex flex-col gap-0.5 shrink-0">
+                  <button onClick={() => moveSectionBy(sectionIndex, -1)} disabled={sectionIndex === 0} className="text-icon disabled:opacity-20 hover:text-primary p-0.5">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                    </svg>
+                  </button>
+                  <button onClick={() => moveSectionBy(sectionIndex, 1)} disabled={sectionIndex === template.sections.length - 1} className="text-icon disabled:opacity-20 hover:text-primary p-0.5">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </button>
+                </div>
+              ) : null}
               <span className="flex-1 text-base font-bold text-heading">{section.name}</span>
               <select
                 value={section.rank ?? ''}
@@ -152,6 +203,17 @@ export default function PackingListTemplateEditor() {
                 {[1,2,3,4,5,6,7,8,9,10].map((n) => <option key={n} value={n}>{n}</option>)}
               </select>
               <span className="text-[11px] text-muted">{section.items.length} items</span>
+              {!sectionReorder && section.items.length > 1 && (
+                <button
+                  onClick={() => setItemReorderSection(itemReorderSection === section.id ? null : section.id)}
+                  className={`shrink-0 p-1 ${itemReorderSection === section.id ? 'text-primary' : 'text-muted hover:text-primary'}`}
+                  title="Reorder items"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                  </svg>
+                </button>
+              )}
               <button
                 onClick={() => deleteSection(section.id)}
                 className="text-muted hover:text-rose-400 p-1"
@@ -163,12 +225,29 @@ export default function PackingListTemplateEditor() {
             </div>
             <div className="px-4 py-2">
               {section.items.map((item, index) => (
-                <TemplateItem
-                  key={index}
-                  name={item}
-                  onDelete={() => removeItemFromSection(section.id, index)}
-                  onRename={(newName) => renameItemInSection(section.id, index, newName)}
-                />
+                <div key={index} className="flex items-center gap-1">
+                  {itemReorderSection === section.id && (
+                    <div className="flex flex-col gap-0.5 shrink-0">
+                      <button onClick={() => moveItemInSection(section.id, index, index - 1)} disabled={index === 0} className="text-muted disabled:opacity-20 hover:text-primary p-0.5">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                        </svg>
+                      </button>
+                      <button onClick={() => moveItemInSection(section.id, index, index + 1)} disabled={index === section.items.length - 1} className="text-muted disabled:opacity-20 hover:text-primary p-0.5">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <TemplateItem
+                      name={item}
+                      onDelete={() => removeItemFromSection(section.id, index)}
+                      onRename={(newName) => renameItemInSection(section.id, index, newName)}
+                    />
+                  </div>
+                </div>
               ))}
               <div className="mt-2">
                 <InlineAdd

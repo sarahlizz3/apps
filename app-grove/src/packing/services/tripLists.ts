@@ -177,6 +177,28 @@ export async function toggleItem(userId: string, tripId: string, trip: TripList,
   });
 }
 
+// --- Reorder ---
+
+export async function reorderSections(userId: string, tripId: string, trip: TripList, fromIndex: number, toIndex: number) {
+  const sections = [...trip.sections];
+  const [moved] = sections.splice(fromIndex, 1);
+  sections.splice(toIndex, 0, moved);
+  await updateDoc(tripListDoc(userId, tripId), { sections, updatedAt: serverTimestamp() });
+}
+
+export async function reorderItems(userId: string, tripId: string, trip: TripList, sectionId: string, fromIndex: number, toIndex: number) {
+  await updateDoc(tripListDoc(userId, tripId), {
+    sections: trip.sections.map((s) => {
+      if (s.id !== sectionId) return s;
+      const items = [...s.items];
+      const [moved] = items.splice(fromIndex, 1);
+      items.splice(toIndex, 0, moved);
+      return { ...s, items };
+    }),
+    updatedAt: serverTimestamp(),
+  });
+}
+
 // --- Reminders ---
 
 export async function addReminder(userId: string, tripId: string, trip: TripList, text: string) {

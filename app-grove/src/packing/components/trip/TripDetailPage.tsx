@@ -11,13 +11,13 @@ import {
   deleteTripList,
   importSectionsIntoTrip,
   importRemindersIntoTrip,
+  reorderSections,
 } from '../../services/tripLists';
 import PackingSection from './PackingSection';
 import ReminderSection from './ReminderSection';
 import InlineAdd from '../ui/InlineAdd';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import ImportDialog from './ImportDialog';
-import { sortSections } from '../../utils/sortSections';
 
 export default function TripDetailPage() {
   const { tripId } = useParams<{ tripId: string }>();
@@ -32,6 +32,7 @@ export default function TripDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [importSectionsOpen, setImportSectionsOpen] = useState(false);
   const [importRemindersOpen, setImportRemindersOpen] = useState(false);
+  const [sectionReorder, setSectionReorder] = useState(false);
 
   if (loading) {
     return (
@@ -86,7 +87,66 @@ export default function TripDetailPage() {
     setImportRemindersOpen(false);
   }
 
+  function moveSectionBy(fromIndex: number, direction: number) {
+    if (!user || !trip) return;
+    const toIndex = fromIndex + direction;
+    if (toIndex < 0 || toIndex >= trip.sections.length) return;
+    reorderSections(user.uid, trip.id, trip, fromIndex, toIndex);
+  }
+
+  function handlePrint() {
+    if (!trip) return;
+    const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    let html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${trip.name}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;font-size:11pt;color:#1a1a1a;line-height:1.5;padding:0.4in;max-width:8.5in}
+h1{font-size:16pt;margin-bottom:2pt}
+.date{font-size:9pt;color:#888;margin-bottom:14pt}
+h2{font-size:11pt;background:#f0f0f0;padding:4pt 8pt;margin:10pt 0 4pt 0;border-radius:3pt}
+ul{list-style:none;padding:0;margin:0 0 6pt 0}
+li{padding:3pt 0 3pt 24pt;position:relative;font-size:10pt;border-bottom:1px solid #eee}
+li::before{content:'\\2610';position:absolute;left:4pt;font-size:13pt;line-height:1}
+li.checked{color:#999;text-decoration:line-through}
+li.checked::before{content:'\\2611'}
+.reminders{background:#fff8e1;border:1px solid #ffe082;border-radius:4pt;padding:6pt 10pt;margin-bottom:10pt;font-size:10pt}
+.reminders strong{color:#f57f17}
+.stats{font-size:9pt;color:#666;margin-bottom:8pt}
+@media print{body{padding:0}}
+</style></head><body>
+<h1>${trip.name}</h1>
+<div class="date">${today}</div>
+<div class="stats">${trip.totalItemCount} items total</div>`;
+
+    if (trip.reminders.length > 0) {
+      html += '<div class="reminders"><strong>Reminders:</strong><ul>';
+      trip.reminders.forEach(r => {
+        html += `<li${r.checked ? ' class="checked"' : ''}>${r.text}</li>`;
+      });
+      html += '</ul></div>';
+    }
+
+    trip.sections.forEach(s => {
+      html += `<h2>${s.name} (${s.items.filter(i => !i.checked).length}/${s.items.length})</h2><ul>`;
+      s.items.forEach(i => {
+        html += `<li${i.checked ? ' class="checked"' : ''}>${i.name}</li>`;
+      });
+      html += '</ul>';
+    });
+
+    html += '</body></html>';
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url);
+    if (w) {
+      w.onload = () => { w.print(); URL.revokeObjectURL(url); };
+    }
+  }
+
   const remaining = trip.totalItemCount - trip.checkedItemCount;
+  // Use raw section order when in reorder mode, otherwise use insertion order (no sort)
+  const displaySections = trip.sections;
 
   return (
     <div className="p-4 max-w-lg mx-auto pb-8">
@@ -117,7 +177,7 @@ export default function TripDetailPage() {
         )}
       </div>
 
-      <div className="flex items-center gap-3 mb-4 text-sm text-secondary">
+      <div className="flex items-center gap-3 mb-4 text-sm text-secondary flex-wrap">
         <span>
           {trip.totalItemCount === 0
             ? 'No items yet'
@@ -138,6 +198,20 @@ export default function TripDetailPage() {
         >
           Delete
         </button>
+        <button
+          onClick={handlePrint}
+          className="text-secondary hover:text-primary"
+        >
+          Print
+        </button>
+        {trip.sections.length > 1 && (
+          <button
+            onClick={() => setSectionReorder(!sectionReorder)}
+            className={sectionReorder ? 'text-primary font-medium' : 'text-secondary hover:text-primary'}
+          >
+            {sectionReorder ? 'Done' : 'Reorder'}
+          </button>
+        )}
       </div>
 
       {/* Reminders */}
@@ -155,8 +229,17 @@ export default function TripDetailPage() {
 
       {/* Sections */}
       <div className="space-y-4">
-        {sortSections(trip.sections).map((section) => (
-          <PackingSection key={section.id} section={section} trip={trip} />
+        {displaySections.map((section, index) => (
+          <PackingSection
+            key={section.id}
+            section={section}
+            trip={trip}
+            reorderMode={sectionReorder}
+            isFirst={index === 0}
+            isLast={index === displaySections.length - 1}
+            onMoveUp={() => moveSectionBy(index, -1)}
+            onMoveDown={() => moveSectionBy(index, 1)}
+          />
         ))}
       </div>
 
