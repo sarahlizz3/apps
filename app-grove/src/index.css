@@ -2,36 +2,39 @@
 
 /* ── Light theme — pastel macaron palette ── */
 :root {
-  --page: #fef6f0;
+  --page: #f4f4f6;
   --card: #ffffff;
-  --section-header: #f5e6f0;
-  --section-border: #e8d5e0;
-  --primary: #b07aa8;
-  --primary-hover: #9a6494;
-  --heading: #6b4c6e;
-  --body: #4a3650;
-  --secondary: #7d6282;
-  --muted: #9a839e;
-  --icon: #b07aa8;
-  --focus: #dfc4db;
-  --border: #edd8e6;
-  --hover: #fdf0f5;
+  --section-header: #f4f4f6;
+  --section-border: #e0dce4;
+  --primary: #9b5de5;
+  --primary-hover: #7b2fd6;
+  --heading: #4a3660;
+  --body: #3d2e4a;
+  --secondary: #6b5080;
+  --muted: #8a7498;
+  --icon: #9b5de5;
+  --focus: #d4b8f0;
+  --border: #e4daea;
+  --hover: #eeebf2;
   --on-primary: #ffffff;
   --on-reminder: #ffffff;
-  --reminder: #fff0f3;
-  --reminder-border: #f9c4cf;
-  --reminder-text: #a83252;
-  --reminder-body: #8e2744;
-  --accent-packing: #a2d2c8;
-  --accent-health: #f5b0c4;
+  --reminder: #fde8ec;
+  --reminder-border: #f5a0b4;
+  --reminder-text: #c02050;
+  --reminder-body: #a01840;
+  --accent-packing: #00c9a7;
+  --accent-health: #f0548c;
+  --glow-1: rgba(155, 93, 229, 0.12);
+  --glow-2: rgba(0, 201, 167, 0.10);
+  --glow-3: rgba(240, 84, 140, 0.10);
 }
 
 /* ── Dark theme — deep purple/violet with warm accents ── */
 html.dark {
   --page: #0f0b18;
   --card: #1a1428;
-  --section-header: #1e1730;
-  --section-border: #2e2545;
+  --section-header: #0f0b18;
+  --section-border: #2a2040;
   --primary: #b8a0d8;
   --primary-hover: #d0bef0;
   --heading: #e8e0f0;
@@ -50,6 +53,9 @@ html.dark {
   --reminder-body: #e890a8;
   --accent-packing: #40c8a8;
   --accent-health: #f07890;
+  --glow-1: rgba(140, 80, 220, 0.18);
+  --glow-2: rgba(64, 200, 168, 0.12);
+  --glow-3: rgba(240, 120, 144, 0.14);
 }
 
 /* ── Tailwind v4 theme tokens ── */

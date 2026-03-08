@@ -35,8 +35,15 @@ export default function LauncherPage() {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-page">
-      <header className="bg-section-header text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0 border-b border-section-border">
+    <div className="relative flex flex-col h-full bg-page overflow-hidden">
+      {/* Corner glows */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-80 h-80 rounded-full blur-3xl" style={{ background: 'var(--glow-1)' }} />
+        <div className="absolute -bottom-40 -right-32 w-96 h-96 rounded-full blur-3xl" style={{ background: 'var(--glow-2)' }} />
+        <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl" style={{ background: 'var(--glow-3)' }} />
+      </div>
+
+      <header className="relative z-10 text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0">
         <h1 className="text-xl font-bold font-display">AppGrove</h1>
         <div className="flex items-center gap-3">
           <button
@@ -65,7 +72,7 @@ export default function LauncherPage() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4">
+      <main className="relative z-10 flex-1 overflow-y-auto p-4">
         <div className="max-w-md mx-auto space-y-4 mt-6">
           <p className="text-center text-muted text-sm">Your apps, one place.</p>
           {apps.map((app) => (
