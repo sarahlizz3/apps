@@ -7,11 +7,14 @@ export default function Header() {
 
   return (
     <header className="bg-section-header text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0 border-b border-section-border">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <Link to="/" className="text-primary-hover hover:text-heading transition-colors p-1" aria-label="Back to AppGrove" title="AppGrove">
           <AppGroveLogo />
         </Link>
-        <h1 className="text-lg font-semibold font-display">Packing List</h1>
+        <div className="w-px h-5 bg-section-border" />
+        <Link to="/packing" className="text-heading hover:text-primary transition-colors">
+          <h1 className="text-lg font-semibold font-display">Packing List</h1>
+        </Link>
       </div>
       <button
         onClick={toggleTheme}

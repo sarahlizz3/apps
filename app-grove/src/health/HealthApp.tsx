@@ -57,11 +57,14 @@ export default function HealthApp() {
       <div className="flex flex-col h-full bg-page">
         {/* Header */}
         <header className="bg-section-header text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0 border-b border-section-border">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link to="/" className="text-primary-hover hover:text-heading transition-colors p-1" aria-label="Back to AppGrove" title="AppGrove">
               <AppGroveLogo />
             </Link>
-            <h1 className="text-lg font-semibold font-display">Health Dashboard</h1>
+            <div className="w-px h-5 bg-section-border" />
+            <button onClick={() => setActiveSection('home')} className="text-heading hover:text-primary transition-colors">
+              <h1 className="text-lg font-semibold font-display">Health Dashboard</h1>
+            </button>
           </div>
           <button onClick={toggleTheme} className="text-primary-hover hover:text-heading transition-colors p-1" aria-label="Toggle theme">
             {dark ? (
