@@ -9,8 +9,19 @@ const INGREDIENT_SECTION_RE =
 const DIRECTION_SECTION_RE =
   /^(?:directions?|instructions?|method|steps?|preparation|how to(?:\s+make)?)\s*:?\s*$/i;
 
-const NOTES_SECTION_RE =
-  /^(?:tips?|notes?|substitutions?|variations?|chef(?:'?s)?\s*(?:notes?|tips?)|recipe\s*(?:notes?|tips?)|make[- ]ahead|storage|leftovers|nutrition(?:\s*info(?:rmation)?)?|equipment|serving\s*suggestions?)\s*:?\s*$/i;
+const NOTES_HEADER_KEYWORDS =
+  /^(?:tips?|notes?|substitutions?|variations?|(?:chef|cook|author)(?:'?s)?\s*(?:notes?|tips?)|(?:recipe|helpful|pro)\s*(?:notes?|tips?)|tips?\s*(?:&|and)\s*tricks?|make[- ]ahead|storage|leftovers|nutrition(?:\s*info(?:rmation)?)?|equipment|serving\s*suggestions?)/i;
+
+const NOTES_SECTION_RE = new RegExp(
+  NOTES_HEADER_KEYWORDS.source + '\\s*:?\\s*$',
+  'i',
+);
+
+/** Matches a notes header followed by inline content on the same line */
+const NOTES_INLINE_RE = new RegExp(
+  NOTES_HEADER_KEYWORDS.source + '\\s*:\\s*(.+)',
+  'i',
+);
 
 const METADATA_PATTERNS = {
   prepTime: /(?:prep(?:\s*time)?)\s*[:=]\s*(.+)/i,
@@ -152,6 +163,14 @@ export function parseRecipeText(text: string): {
     if (NOTES_SECTION_RE.test(line)) {
       currentSection = 'notes';
       notesSections.push({ heading: line.replace(/\s*:?\s*$/, ''), lines: [] });
+      continue;
+    }
+    // Handle "Tips: some inline content" (header + content on same line)
+    const inlineMatch = line.match(NOTES_INLINE_RE);
+    if (inlineMatch) {
+      currentSection = 'notes';
+      const heading = line.replace(/\s*:\s*.+$/, '').trim();
+      notesSections.push({ heading, lines: [inlineMatch[1].trim()] });
       continue;
     }
 

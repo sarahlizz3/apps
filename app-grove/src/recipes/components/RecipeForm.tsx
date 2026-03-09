@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../shared/AuthContext';
 import { useRecipe } from '../hooks/useRecipe';
 import { useRecipes } from '../hooks/useRecipes';
-import { createRecipe, updateRecipe, deleteRecipe } from '../services';
+import { createRecipe, updateRecipe, deleteRecipe, clearField } from '../services';
 import { DEFAULT_CATEGORY } from '../utils/constants';
 import type { DifficultyTier } from '../types';
 import DifficultySelector from './DifficultySelector';
@@ -94,19 +94,30 @@ export default function RecipeForm() {
       .map((l) => l.trim())
       .filter(Boolean);
 
+    // For updates, use deleteField() to clear empty optional fields;
+    // for creates, simply omit them (Firestore rejects undefined).
+    const empty = isEdit ? clearField() : undefined;
+
     const data: Record<string, unknown> = {
       title: title.trim(),
       ingredients,
       directions,
       category: category.trim() || DEFAULT_CATEGORY,
       difficulty,
+      prepTime: prepTime.trim() || empty,
+      cookTime: cookTime.trim() || empty,
+      servings: servings.trim() || empty,
+      imageUrl: imageUrl.trim() || empty,
+      sourceUrl: sourceUrl.trim() || empty,
+      notes: notes.trim() || empty,
     };
-    if (prepTime.trim()) data.prepTime = prepTime.trim();
-    if (cookTime.trim()) data.cookTime = cookTime.trim();
-    if (servings.trim()) data.servings = servings.trim();
-    if (imageUrl.trim()) data.imageUrl = imageUrl.trim();
-    if (sourceUrl.trim()) data.sourceUrl = sourceUrl.trim();
-    if (notes.trim()) data.notes = notes.trim();
+
+    // Strip undefined keys (create mode) since Firestore rejects them
+    if (!isEdit) {
+      for (const key of Object.keys(data)) {
+        if (data[key] === undefined) delete data[key];
+      }
+    }
 
     try {
       if (isEdit && recipeId) {

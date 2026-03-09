@@ -3,6 +3,7 @@ import { useAuth } from '../shared/AuthContext';
 import { useTheme } from '../shared/ThemeContext';
 import { signOut } from '../shared/auth';
 import appGroveLogo from '../shared/assets/app-grove.svg';
+import ricebowlUrl from '../recipes/assets/ricebowl.svg';
 
 export default function LauncherPage() {
   const { user } = useAuth();
@@ -40,9 +41,20 @@ export default function LauncherPage() {
       iconBg: 'bg-accent-recipes/15',
       iconColor: 'text-accent-recipes',
       icon: (
-        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 3v6m0 0v6m0-6h6m-6 0H9M9 3l-1.5 6L9 15M9 3H6.5L5 9l1.5 6H9m0 0v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3" />
-        </svg>
+        <span
+          className="inline-block w-8 h-8"
+          style={{
+            backgroundColor: 'currentColor',
+            WebkitMaskImage: `url(${ricebowlUrl})`,
+            WebkitMaskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            maskImage: `url(${ricebowlUrl})`,
+            maskSize: 'contain',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center',
+          }}
+        />
       ),
     },
   ];

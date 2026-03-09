@@ -4,6 +4,7 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../shared/firebase';
@@ -44,3 +45,6 @@ export async function updateRecipe(
 export async function deleteRecipe(userId: string, recipeId: string) {
   await deleteDoc(recipeDoc(userId, recipeId));
 }
+
+/** Sentinel value to remove a field from Firestore on update */
+export const clearField = deleteField;

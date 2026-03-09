@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* ── Light theme — pastel macaron palette ── */
 :root {
@@ -119,4 +120,15 @@ html.dark input,
 html.dark select {
   background-color: var(--card);
   color: var(--body);
+}
+
+/* ── Prose (markdown) dark mode overrides ── */
+html.dark .prose {
+  --tw-prose-body: var(--body);
+  --tw-prose-headings: var(--heading);
+  --tw-prose-bold: var(--heading);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bullets: var(--secondary);
+  --tw-prose-counters: var(--secondary);
+  --tw-prose-hr: var(--border);
 }
