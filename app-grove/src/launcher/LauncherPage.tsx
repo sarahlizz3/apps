@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../shared/AuthContext';
 import { useTheme } from '../shared/ThemeContext';
 import { signOut } from '../shared/auth';
+import appGroveLogo from '../shared/assets/app-grove.svg';
 
 export default function LauncherPage() {
   const { user } = useAuth();
@@ -56,7 +57,23 @@ export default function LauncherPage() {
       </div>
 
       <header className="relative z-10 text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0">
-        <h1 className="text-xl font-bold font-display">AppGrove</h1>
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-block w-6 h-6 text-heading"
+            style={{
+              backgroundColor: 'currentColor',
+              WebkitMaskImage: `url(${appGroveLogo})`,
+              WebkitMaskSize: 'contain',
+              WebkitMaskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'center',
+              maskImage: `url(${appGroveLogo})`,
+              maskSize: 'contain',
+              maskRepeat: 'no-repeat',
+              maskPosition: 'center',
+            }}
+          />
+          <h1 className="text-xl font-bold font-display">AppGrove</h1>
+        </div>
         <div className="flex items-center gap-3">
           <button
             onClick={toggleTheme}

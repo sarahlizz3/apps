@@ -1,5 +1,6 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import { useTheme } from '../../shared/ThemeContext';
+import appGroveLogo from '../../shared/assets/app-grove.svg';
 import RecipeHome from './RecipeHome';
 import RecipeForm from './RecipeForm';
 import RecipeView from './RecipeView';
@@ -14,10 +15,19 @@ export default function RecipeApp() {
       <header className="bg-section-header text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0 border-b border-section-border">
         <div className="flex items-center gap-2">
           <Link to="/" className="text-primary-hover hover:text-heading transition-colors p-1" aria-label="Back to AppGrove" title="AppGrove">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 19h8a4 4 0 0 0 3.8-2.8 4 4 0 0 0-1.6-4.5c1-1.2 1.4-2.9.8-4.4-.6-1.5-2-2.4-3.5-2.3.1-.3.1-.6.1-.9a3.1 3.1 0 0 0-3.3-3.1 3.1 3.1 0 0 0-3 2.2A3.5 3.5 0 0 0 5 6.9c-.1 1.4.6 2.7 1.8 3.4a4 4 0 0 0-.6 3.9A4 4 0 0 0 8 19Z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 19v3" />
-            </svg>
+            <span
+              className="inline-block w-5 h-5 bg-current"
+              style={{
+                WebkitMaskImage: `url(${appGroveLogo})`,
+                WebkitMaskSize: 'contain',
+                WebkitMaskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                maskImage: `url(${appGroveLogo})`,
+                maskSize: 'contain',
+                maskRepeat: 'no-repeat',
+                maskPosition: 'center',
+              }}
+            />
           </Link>
           <h1 className="text-lg font-semibold font-display">Recipes</h1>
         </div>
