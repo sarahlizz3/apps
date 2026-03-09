@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useRecipes } from '../hooks/useRecipes';
+import type { DifficultyTier } from '../types';
 import SearchBar from './SearchBar';
 import CategoryFilter from './CategoryFilter';
+import DifficultyFilter from './DifficultyFilter';
 import RecipeCard from './RecipeCard';
 
 export default function RecipeHome() {
   const { recipes, loading } = useRecipes();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyTier | 'All'>('All');
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -21,6 +24,10 @@ export default function RecipeHome() {
 
     if (selectedCategory !== 'All') {
       list = list.filter((r) => r.category === selectedCategory);
+    }
+
+    if (selectedDifficulty !== 'All') {
+      list = list.filter((r) => r.difficulty === selectedDifficulty);
     }
 
     const term = search.trim().toLowerCase();
@@ -40,7 +47,7 @@ export default function RecipeHome() {
     }
 
     return list;
-  }, [recipes, search, selectedCategory]);
+  }, [recipes, search, selectedCategory, selectedDifficulty]);
 
   if (loading) {
     return (
@@ -71,6 +78,10 @@ export default function RecipeHome() {
             onSelect={setSelectedCategory}
           />
         )}
+        <DifficultyFilter
+          selected={selectedDifficulty}
+          onSelect={setSelectedDifficulty}
+        />
       </div>
 
       {filtered.length === 0 ? (
