@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sort -k2)",
+      "Bash(npm create:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(xargs sed:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(node:*)",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git restore:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(firebase deploy:*)",
+      "Bash(ls:*)",
+      "Bash(git rm:*)",
+      "Bash(git:*)",
+      "Bash(kill %1:*)",
+      "Bash(npx tsc:*)",
+      "Bash(rm:*)",
+      "Bash(python3:*)",
+      "Bash(rsvg-convert:*)"
+    ]
+  }
+}
