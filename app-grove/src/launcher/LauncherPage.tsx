@@ -3,6 +3,7 @@ import { useAuth } from '../shared/AuthContext';
 import { useTheme } from '../shared/ThemeContext';
 import { signOut } from '../shared/auth';
 import AppGroveLogo from '../shared/AppGroveLogo';
+import DifficultyIcon from '../recipes/components/DifficultyIcon';
 
 export default function LauncherPage() {
   const { user } = useAuth();
@@ -40,12 +41,7 @@ export default function LauncherPage() {
       iconBg: 'bg-accent-recipes/15',
       iconColor: 'text-accent-recipes',
       icon: (
-        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M3 11h18c0 5-4 9-9 9s-9-4-9-9z" strokeWidth="1.8" strokeLinejoin="round" />
-          <path d="M5 11c0-3 3-5 7-5s7 2 7 5" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M9 2l-1 9" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M15 2l1 9" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
+        <DifficultyIcon tier="rice-bowl" size="lg" />
       ),
     },
   ];
