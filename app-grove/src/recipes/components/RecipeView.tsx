@@ -169,7 +169,7 @@ export default function RecipeView() {
               <div className="flex justify-between items-center">
                 <span className="text-secondary">Difficulty</span>
                 <span className="flex items-center gap-1.5 font-medium">
-                  <DifficultyIcon tier={recipe.difficulty} size="sm" />
+                  <DifficultyIcon tier={recipe.difficulty} size="md" />
                   <span className="text-body">{difficultyInfo.label}</span>
                 </span>
               </div>

@@ -17,14 +17,14 @@ export default function DifficultySelector({ value, onChange }: Props) {
             key={tier.key}
             type="button"
             onClick={() => onChange(selected ? null : tier.key)}
-            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg border transition-colors ${
+            className={`flex flex-col items-center gap-1.5 px-4 py-3 rounded-lg border transition-colors ${
               selected
                 ? 'border-2 bg-hover/60'
                 : 'border border-border opacity-60 hover:opacity-100'
             }`}
             style={selected ? { borderColor: tier.color, backgroundColor: `${tier.color}15` } : undefined}
           >
-            <DifficultyIcon tier={tier.key} size="md" />
+            <DifficultyIcon tier={tier.key} size="xl" />
             <span className="text-xs font-medium">{tier.label}</span>
           </button>
         );

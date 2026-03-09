@@ -41,7 +41,7 @@ export default function LauncherPage() {
       iconBg: 'bg-accent-recipes/15',
       iconColor: 'text-accent-recipes',
       icon: (
-        <DifficultyIcon tier="rice-bowl" size="lg" />
+        <DifficultyIcon tier="rice-bowl" size="xl" />
       ),
     },
   ];

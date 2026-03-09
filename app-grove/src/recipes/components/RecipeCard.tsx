@@ -35,7 +35,7 @@ export default function RecipeCard({ recipe }: Props) {
                 {recipe.category}
               </span>
             )}
-            <DifficultyIcon tier={recipe.difficulty} size="sm" />
+            <DifficultyIcon tier={recipe.difficulty} size="md" />
             {totalTime && (
               <span className="text-xs text-secondary">{totalTime}</span>
             )}
