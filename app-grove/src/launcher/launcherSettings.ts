@@ -13,22 +13,28 @@ export interface LauncherSettings {
   externalApps: ExternalApp[];
 }
 
-const SETTINGS_DOC = doc(db, 'settings', 'launcher');
-
 const DEFAULT_ORDER = ['packing', 'health', 'recipes'];
+const DEFAULTS: LauncherSettings = { appOrder: DEFAULT_ORDER, externalApps: [] };
 
-export async function getLauncherSettings(): Promise<LauncherSettings> {
-  const snap = await getDoc(SETTINGS_DOC);
-  if (!snap.exists()) {
-    return { appOrder: DEFAULT_ORDER, externalApps: [] };
-  }
-  const data = snap.data();
-  return {
-    appOrder: data.appOrder ?? DEFAULT_ORDER,
-    externalApps: data.externalApps ?? [],
-  };
+function settingsDoc(uid: string) {
+  return doc(db, 'users', uid, 'settings', 'launcher');
 }
 
-export async function saveLauncherSettings(settings: LauncherSettings): Promise<void> {
-  await setDoc(SETTINGS_DOC, settings);
+export async function getLauncherSettings(uid: string): Promise<LauncherSettings> {
+  try {
+    const snap = await getDoc(settingsDoc(uid));
+    if (!snap.exists()) return DEFAULTS;
+    const data = snap.data();
+    return {
+      appOrder: data.appOrder ?? DEFAULT_ORDER,
+      externalApps: data.externalApps ?? [],
+    };
+  } catch (e) {
+    console.error('Failed to load launcher settings', e);
+    return DEFAULTS;
+  }
+}
+
+export async function saveLauncherSettings(uid: string, settings: LauncherSettings): Promise<void> {
+  await setDoc(settingsDoc(uid), settings);
 }

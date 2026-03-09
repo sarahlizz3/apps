@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../shared/ThemeContext';
+import { useAuth } from '../shared/AuthContext';
 import AppGroveLogo from '../shared/AppGroveLogo';
 import {
   getLauncherSettings,
@@ -17,6 +18,8 @@ const BUILTIN_APPS: Record<string, string> = {
 
 export default function SettingsPage() {
   const { dark, toggleTheme } = useTheme();
+  const { user } = useAuth();
+  const uid = user?.uid ?? '';
   const [settings, setSettings] = useState<LauncherSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -29,16 +32,17 @@ export default function SettingsPage() {
   const [formDesc, setFormDesc] = useState('');
 
   useEffect(() => {
-    getLauncherSettings().then((s) => {
+    if (!uid) return;
+    getLauncherSettings(uid).then((s) => {
       setSettings(s);
       setLoading(false);
     });
-  }, []);
+  }, [uid]);
 
   async function save(updated: LauncherSettings) {
     setSettings(updated);
     setSaving(true);
-    await saveLauncherSettings(updated);
+    await saveLauncherSettings(uid, updated);
     setSaving(false);
   }
 

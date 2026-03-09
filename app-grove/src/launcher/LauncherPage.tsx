@@ -64,11 +64,12 @@ export default function LauncherPage() {
   const [externalApps, setExternalApps] = useState<ExternalApp[]>([]);
 
   useEffect(() => {
-    getLauncherSettings().then((s) => {
+    if (!user) return;
+    getLauncherSettings(user.uid).then((s) => {
       setAppOrder(s.appOrder);
       setExternalApps(s.externalApps);
     });
-  }, []);
+  }, [user]);
 
   const orderedApps = appOrder.map((key) => BUILTIN_APPS[key]).filter(Boolean);
 
