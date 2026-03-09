@@ -1,6 +1,6 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import { useTheme } from '../../shared/ThemeContext';
-import appGroveLogo from '../../shared/assets/app-grove.svg';
+import AppGroveLogo from '../../shared/AppGroveLogo';
 import RecipeHome from './RecipeHome';
 import RecipeForm from './RecipeForm';
 import RecipeView from './RecipeView';
@@ -15,19 +15,7 @@ export default function RecipeApp() {
       <header className="bg-section-header text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0 border-b border-section-border">
         <div className="flex items-center gap-2">
           <Link to="/" className="text-primary-hover hover:text-heading transition-colors p-1" aria-label="Back to AppGrove" title="AppGrove">
-            <span
-              className="inline-block w-5 h-5 bg-current"
-              style={{
-                WebkitMaskImage: `url(${appGroveLogo})`,
-                WebkitMaskSize: 'contain',
-                WebkitMaskRepeat: 'no-repeat',
-                WebkitMaskPosition: 'center',
-                maskImage: `url(${appGroveLogo})`,
-                maskSize: 'contain',
-                maskRepeat: 'no-repeat',
-                maskPosition: 'center',
-              }}
-            />
+            <AppGroveLogo />
           </Link>
           <h1 className="text-lg font-semibold font-display">Recipes</h1>
         </div>

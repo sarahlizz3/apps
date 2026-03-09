@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../shared/AuthContext';
 import { useTheme } from '../shared/ThemeContext';
 import { signOut } from '../shared/auth';
-import appGroveLogo from '../shared/assets/app-grove.svg';
-import ricebowlUrl from '../recipes/assets/ricebowl.svg';
+import AppGroveLogo from '../shared/AppGroveLogo';
 
 export default function LauncherPage() {
   const { user } = useAuth();
@@ -41,20 +40,12 @@ export default function LauncherPage() {
       iconBg: 'bg-accent-recipes/15',
       iconColor: 'text-accent-recipes',
       icon: (
-        <span
-          className="inline-block w-8 h-8"
-          style={{
-            backgroundColor: 'currentColor',
-            WebkitMaskImage: `url(${ricebowlUrl})`,
-            WebkitMaskSize: 'contain',
-            WebkitMaskRepeat: 'no-repeat',
-            WebkitMaskPosition: 'center',
-            maskImage: `url(${ricebowlUrl})`,
-            maskSize: 'contain',
-            maskRepeat: 'no-repeat',
-            maskPosition: 'center',
-          }}
-        />
+        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M3 11h18c0 5-4 9-9 9s-9-4-9-9z" strokeWidth="1.8" strokeLinejoin="round" />
+          <path d="M5 11c0-3 3-5 7-5s7 2 7 5" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M9 2l-1 9" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M15 2l1 9" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
       ),
     },
   ];
@@ -70,20 +61,7 @@ export default function LauncherPage() {
 
       <header className="relative z-10 text-heading px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <span
-            className="inline-block w-6 h-6 text-heading"
-            style={{
-              backgroundColor: 'currentColor',
-              WebkitMaskImage: `url(${appGroveLogo})`,
-              WebkitMaskSize: 'contain',
-              WebkitMaskRepeat: 'no-repeat',
-              WebkitMaskPosition: 'center',
-              maskImage: `url(${appGroveLogo})`,
-              maskSize: 'contain',
-              maskRepeat: 'no-repeat',
-              maskPosition: 'center',
-            }}
-          />
+          <AppGroveLogo className="w-6 h-6" />
           <h1 className="text-xl font-bold font-display">AppGrove</h1>
         </div>
         <div className="flex items-center gap-3">
