@@ -4,6 +4,7 @@ import { AuthProvider } from './shared/AuthContext';
 import ProtectedRoute from './shared/ProtectedRoute';
 import LoginPage from './shared/LoginPage';
 import LauncherPage from './launcher/LauncherPage';
+import SettingsPage from './launcher/SettingsPage';
 
 // Packing list app
 import PackingAppShell from './packing/components/layout/AppShell';
@@ -31,6 +32,7 @@ export default function App() {
                 <ProtectedRoute>
                   <Routes>
                     <Route path="/" element={<LauncherPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
 
                     {/* Packing List */}
                     <Route element={<PackingAppShell />}>

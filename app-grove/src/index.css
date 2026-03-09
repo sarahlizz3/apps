@@ -7,13 +7,13 @@
   --card: #ffffff;
   --section-header: #f4f4f6;
   --section-border: #e0dce4;
-  --primary: #9b5de5;
-  --primary-hover: #7b2fd6;
+  --primary: #6425c4;
+  --primary-hover: #5018a8;
   --heading: #4a3660;
   --body: #3d2e4a;
-  --secondary: #6b5080;
-  --muted: #8a7498;
-  --icon: #9b5de5;
+  --secondary: #533d68;
+  --muted: #5d4772;
+  --icon: #6425c4;
   --focus: #d4b8f0;
   --border: #e4daea;
   --hover: #eeebf2;
@@ -26,7 +26,7 @@
   --accent-packing: #00c9a7;
   --accent-health: #f0548c;
   --accent-recipes: #f59e0b;
-  --glow-1: rgba(155, 93, 229, 0.12);
+  --glow-1: rgba(100, 37, 196, 0.12);
   --glow-2: rgba(0, 201, 167, 0.10);
   --glow-3: rgba(240, 84, 140, 0.10);
 }

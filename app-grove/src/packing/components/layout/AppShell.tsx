@@ -11,9 +11,16 @@ export default function AppShell() {
   const { pullDistance, refreshing } = usePullToRefresh(mainRef);
 
   return (
-    <div className="flex flex-col h-full bg-page">
+    <div className="relative flex flex-col h-full bg-page overflow-hidden">
+      {/* Corner glows */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-80 h-80 rounded-full blur-3xl" style={{ background: 'rgba(0, 201, 167, 0.10)' }} />
+        <div className="absolute -bottom-40 -right-32 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(100, 37, 196, 0.08)' }} />
+        <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl" style={{ background: 'rgba(0, 201, 167, 0.06)' }} />
+      </div>
+
       <Header />
-      <main ref={mainRef} className="flex-1 overflow-y-auto relative">
+      <main ref={mainRef} className="relative z-10 flex-1 overflow-y-auto">
         {pullDistance > 0 && (
           <div
             className="flex items-center justify-center pointer-events-none"
