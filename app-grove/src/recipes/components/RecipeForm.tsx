@@ -62,6 +62,7 @@ export default function RecipeForm() {
     title: string;
     ingredients: string[];
     directions: string[];
+    notes?: string;
     prepTime?: string;
     cookTime?: string;
     servings?: string;
@@ -71,6 +72,7 @@ export default function RecipeForm() {
     setTitle(data.title || '');
     setIngredientsText(data.ingredients.join('\n'));
     setDirectionsText(data.directions.join('\n'));
+    setNotes(data.notes || '');
     setPrepTime(data.prepTime || '');
     setCookTime(data.cookTime || '');
     setServings(data.servings || '');

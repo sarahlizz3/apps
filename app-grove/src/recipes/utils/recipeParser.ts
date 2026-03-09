@@ -9,6 +9,9 @@ const INGREDIENT_SECTION_RE =
 const DIRECTION_SECTION_RE =
   /^(?:directions?|instructions?|method|steps?|preparation|how to(?:\s+make)?)\s*:?\s*$/i;
 
+const NOTES_SECTION_RE =
+  /^(?:tips?|notes?|substitutions?|variations?|chef(?:'?s)?\s*(?:notes?|tips?)|recipe\s*(?:notes?|tips?)|make[- ]ahead|storage|leftovers|nutrition(?:\s*info(?:rmation)?)?|equipment|serving\s*suggestions?)\s*:?\s*$/i;
+
 const METADATA_PATTERNS = {
   prepTime: /(?:prep(?:\s*time)?)\s*[:=]\s*(.+)/i,
   cookTime: /(?:cook(?:\s*time)?)\s*[:=]\s*(.+)/i,
@@ -109,6 +112,7 @@ export function parseRecipeText(text: string): {
   title: string;
   ingredients: string[];
   directions: string[];
+  notes?: string;
   prepTime?: string;
   cookTime?: string;
   servings?: string;
@@ -121,7 +125,8 @@ export function parseRecipeText(text: string): {
   let title = '';
   const ingredients: string[] = [];
   const directions: string[] = [];
-  let currentSection: 'none' | 'ingredients' | 'directions' = 'none';
+  const notesSections: { heading: string; lines: string[] }[] = [];
+  let currentSection: 'none' | 'ingredients' | 'directions' | 'notes' = 'none';
   let titleFound = false;
 
   for (let i = 0; i < lines.length; i++) {
@@ -142,6 +147,11 @@ export function parseRecipeText(text: string): {
     }
     if (DIRECTION_SECTION_RE.test(line)) {
       currentSection = 'directions';
+      continue;
+    }
+    if (NOTES_SECTION_RE.test(line)) {
+      currentSection = 'notes';
+      notesSections.push({ heading: line.replace(/\s*:?\s*$/, ''), lines: [] });
       continue;
     }
 
@@ -173,6 +183,10 @@ export function parseRecipeText(text: string): {
           directions.push(cleaned);
         }
       }
+    } else if (currentSection === 'notes') {
+      if (notesSections.length > 0) {
+        notesSections[notesSections.length - 1].lines.push(line);
+      }
     }
   }
 
@@ -196,10 +210,22 @@ export function parseRecipeText(text: string): {
     }
   }
 
+  // Build notes string from captured sections
+  let notes: string | undefined;
+  if (notesSections.length > 0) {
+    const parts = notesSections
+      .filter((s) => s.lines.length > 0)
+      .map((s) => `**${s.heading}**\n${s.lines.join('\n')}`);
+    if (parts.length > 0) {
+      notes = parts.join('\n\n');
+    }
+  }
+
   return {
     title,
     ingredients,
     directions,
+    notes,
     ...metadata,
   };
 }

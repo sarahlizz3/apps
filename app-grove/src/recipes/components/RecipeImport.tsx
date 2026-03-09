@@ -6,6 +6,7 @@ interface ImportData {
   title: string;
   ingredients: string[];
   directions: string[];
+  notes?: string;
   prepTime?: string;
   cookTime?: string;
   servings?: string;
