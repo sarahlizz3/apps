@@ -4,7 +4,7 @@ interface Props {
 
 export default function AppGroveLogo({ className = 'w-5 h-5' }: Props) {
   return (
-    <svg className={className} viewBox="190 250 700 680" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <svg className={className} viewBox="228 290 542 660" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <g transform="translate(0,1080) scale(0.1,-0.1)">
         <path d="M3935 7785 c-268 -49 -502 -226 -624 -470 -63 -126 -82 -208 -88
 -372 -4 -88 -10 -146 -17 -151 -6 -5 -56 -14 -111 -20 -162 -18 -278 -64 -404
