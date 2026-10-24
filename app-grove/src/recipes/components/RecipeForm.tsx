@@ -4,9 +4,10 @@ import { useAuth } from '../../shared/AuthContext';
 import { useRecipe } from '../hooks/useRecipe';
 import { useRecipes } from '../hooks/useRecipes';
 import { createRecipe, updateRecipe, deleteRecipe, clearField } from '../services';
-import { DEFAULT_CATEGORY } from '../utils/constants';
+import { recipeTags } from '../utils/tags';
 import type { DifficultyTier } from '../types';
 import DifficultySelector from './DifficultySelector';
+import TagInput from './TagInput';
 import RecipeImport from './RecipeImport';
 import ConfirmDialog from '../../packing/components/ui/ConfirmDialog';
 
@@ -19,8 +20,9 @@ export default function RecipeForm() {
   const isEdit = Boolean(recipeId);
 
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [category, setCategory] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [prepTime, setPrepTime] = useState('');
   const [cookTime, setCookTime] = useState('');
   const [servings, setServings] = useState('');
@@ -33,18 +35,19 @@ export default function RecipeForm() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [formReady, setFormReady] = useState(false);
 
-  // Existing categories for autocomplete
-  const existingCategories = useMemo(() => {
-    const cats = new Set(recipes.map((r) => r.category).filter(Boolean));
-    return Array.from(cats).sort();
+  // Every tag used on any recipe, offered as suggestions
+  const existingTags = useMemo(() => {
+    const all = new Set(recipes.flatMap((r) => recipeTags(r)));
+    return Array.from(all).sort((a, b) => a.localeCompare(b));
   }, [recipes]);
 
   // Populate form in edit mode
   useEffect(() => {
     if (isEdit && recipe) {
       setTitle(recipe.title);
+      setDescription(recipe.description || '');
       setImageUrl(recipe.imageUrl || '');
-      setCategory(recipe.category || '');
+      setTags(recipeTags(recipe));
       setPrepTime(recipe.prepTime || '');
       setCookTime(recipe.cookTime || '');
       setServings(recipe.servings || '');
@@ -60,6 +63,7 @@ export default function RecipeForm() {
   // In create mode, show import first, then form
   function handleImport(data: {
     title: string;
+    description?: string;
     ingredients: string[];
     directions: string[];
     notes?: string;
@@ -70,6 +74,7 @@ export default function RecipeForm() {
     sourceUrl?: string;
   }) {
     setTitle(data.title || '');
+    setDescription(data.description || '');
     setIngredientsText(data.ingredients.join('\n'));
     setDirectionsText(data.directions.join('\n'));
     setNotes(data.notes || '');
@@ -100,9 +105,13 @@ export default function RecipeForm() {
 
     const data: Record<string, unknown> = {
       title: title.trim(),
+      description: description.trim() || empty,
       ingredients,
       directions,
-      category: category.trim() || DEFAULT_CATEGORY,
+      tags,
+      // Recipes from before tags have a `category` field; it's carried into
+      // `tags` above, so drop it on save.
+      category: empty,
       difficulty,
       prepTime: prepTime.trim() || empty,
       cookTime: cookTime.trim() || empty,
@@ -187,6 +196,20 @@ export default function RecipeForm() {
             />
           </div>
 
+          {/* Description */}
+          <div>
+            <label htmlFor="recipe-description" className="block text-sm font-medium text-secondary mb-1">
+              Description
+            </label>
+            <textarea
+              id="recipe-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              className="w-full bg-page border border-border rounded-lg px-3 py-2 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+
           {/* Image URL */}
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">
@@ -211,24 +234,12 @@ export default function RecipeForm() {
             )}
           </div>
 
-          {/* Category */}
+          {/* Tags */}
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1">
-              Category
+            <label htmlFor="recipe-tags" className="block text-sm font-medium text-secondary mb-1">
+              Tags
             </label>
-            <input
-              type="text"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              placeholder={DEFAULT_CATEGORY}
-              list="recipe-categories"
-              className="w-full bg-page border border-border rounded-lg px-3 py-2 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-            <datalist id="recipe-categories">
-              {existingCategories.map((cat) => (
-                <option key={cat} value={cat} />
-              ))}
-            </datalist>
+            <TagInput id="recipe-tags" value={tags} onChange={setTags} existing={existingTags} />
           </div>
 
           {/* Prep time, Cook time, Servings row */}

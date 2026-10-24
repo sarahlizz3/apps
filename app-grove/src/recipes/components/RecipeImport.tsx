@@ -4,6 +4,7 @@ import { extractRecipeFromUrl } from '../utils/recipeExtractor';
 
 interface ImportData {
   title: string;
+  description?: string;
   ingredients: string[];
   directions: string[];
   notes?: string;

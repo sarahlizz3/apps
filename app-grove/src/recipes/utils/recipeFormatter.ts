@@ -6,12 +6,13 @@ import { AUTO_PREPENDED_STEPS } from './constants';
 
 interface FormattableRecipe {
   title: string;
+  description?: string;
   ingredients: string[];
   directions: string[];
   prepTime?: string;
   cookTime?: string;
   servings?: string;
-  category?: string;
+  tags?: string[];
   sourceUrl?: string;
 }
 
@@ -20,6 +21,7 @@ export function formatRecipeAsText(recipe: FormattableRecipe): string {
 
   // Title
   lines.push(recipe.title.toUpperCase());
+  if (recipe.description) lines.push(recipe.description);
   lines.push('');
 
   // Metadata line
@@ -30,10 +32,11 @@ export function formatRecipeAsText(recipe: FormattableRecipe): string {
   if (metaParts.length > 0) {
     lines.push(metaParts.join(' | '));
   }
-  if (recipe.category) {
-    lines.push(`Category: ${recipe.category}`);
+  const tags = recipe.tags ?? [];
+  if (tags.length > 0) {
+    lines.push(`Tags: ${tags.join(', ')}`);
   }
-  if (metaParts.length > 0 || recipe.category) {
+  if (metaParts.length > 0 || tags.length > 0) {
     lines.push('');
   }
 

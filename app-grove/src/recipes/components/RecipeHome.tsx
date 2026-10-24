@@ -6,6 +6,7 @@ import SearchBar from './SearchBar';
 import CategoryFilter from './CategoryFilter';
 import DifficultyFilter from './DifficultyFilter';
 import RecipeCard from './RecipeCard';
+import { recipeTags } from '../utils/tags';
 
 export default function RecipeHome() {
   const { recipes, loading } = useRecipes();
@@ -15,15 +16,15 @@ export default function RecipeHome() {
 
   const categories = useMemo(() => {
     const set = new Set<string>();
-    recipes.forEach((r) => { if (r.category) set.add(r.category); });
-    return Array.from(set).sort();
+    recipes.forEach((r) => recipeTags(r).forEach((t) => set.add(t)));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [recipes]);
 
   const filtered = useMemo(() => {
     let list = recipes;
 
     if (selectedCategory !== 'All') {
-      list = list.filter((r) => r.category === selectedCategory);
+      list = list.filter((r) => recipeTags(r).includes(selectedCategory));
     }
 
     if (selectedDifficulty !== 'All') {
@@ -35,7 +36,7 @@ export default function RecipeHome() {
       list = list.filter((r) => {
         const haystack = [
           r.title,
-          r.category,
+          ...recipeTags(r),
           r.notes ?? '',
           ...r.ingredients,
           ...r.directions,

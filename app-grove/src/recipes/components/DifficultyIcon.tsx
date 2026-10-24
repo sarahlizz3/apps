@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { DifficultyTier } from '../types';
 import { DIFFICULTY_TIERS } from '../utils/constants';
 
@@ -53,11 +54,58 @@ function SkilletIcon({ color, size }: { color: string; size: number }) {
   );
 }
 
+function InstantPotIcon({ color, size }: { color: string; size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill={color}>
+      <path fillRule="evenodd" d="M8 17h32v21a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4ZM15 22h18v10H15Z" />
+      <path d="M8 15c2-5 9-8 16-8s14 3 16 8Z" />
+      <rect x="21" y="3" width="6" height="4" rx="1.5" />
+      <rect x="3" y="21" width="5" height="7" rx="1.5" />
+      <rect x="40" y="21" width="5" height="7" rx="1.5" />
+      <rect x="18" y="25" width="7" height="4" rx="1" />
+      <circle cx="29" cy="27" r="1.8" />
+    </svg>
+  );
+}
+
+/** Roast turkey on a platter, side view, drumsticks to the right */
+function SpecialOccasionIcon({ color, size }: { color: string; size: number }) {
+  // The mask cuts a thin gap around the front drumstick and a wing line into
+  // the body, so the shapes read separately in a single color. useId keeps
+  // the mask id unique when several icons are on screen.
+  const maskId = `turkey-${useId()}`;
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill={color}>
+      <defs>
+        <mask id={maskId}>
+          <rect width="48" height="48" fill="#fff" />
+          <ellipse cx="35" cy="26.5" rx="7.5" ry="4.6" transform="rotate(-28 35 26.5)" fill="none" stroke="#000" strokeWidth="2.2" />
+          <path d="M13 22c4 1 9 5 11 10" fill="none" stroke="#000" strokeWidth="1.6" strokeLinecap="round" />
+        </mask>
+      </defs>
+      <g mask={`url(#${maskId})`}>
+        <path d="M3 30c0-9 8-16 18-16 6 0 11 2 14 6l3 4c2 3 1 7-2 9-2 1-4 2-7 2H8c-3 0-5-2-5-5Z" />
+        <ellipse cx="33" cy="20" rx="6.5" ry="4" transform="rotate(-38 33 20)" />
+        <path d="M37 16.5 40.5 13" stroke={color} strokeWidth="2.6" strokeLinecap="round" />
+        <circle cx="42" cy="13.5" r="2" />
+        <circle cx="40" cy="11.5" r="2" />
+      </g>
+      <ellipse cx="35" cy="26.5" rx="6.5" ry="3.8" transform="rotate(-28 35 26.5)" />
+      <path d="M40.5 23.5 44 21.5" stroke={color} strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx="45.5" cy="22.2" r="2" />
+      <circle cx="44.6" cy="19.8" r="2" />
+      <path d="M1 37.5h46c-1 3-8 5-23 5S2 40.5 1 37.5Z" />
+    </svg>
+  );
+}
+
 const iconComponents: Record<string, typeof RamenIcon> = {
   'instant-ramen': RamenIcon,
   tacos: TacoIcon,
   'rice-bowl': RiceBowlIcon,
+  'instant-pot': InstantPotIcon,
   skillet: SkilletIcon,
+  'special-occasion': SpecialOccasionIcon,
 };
 
 export default function DifficultyIcon({ tier, size = 'md' }: Props) {

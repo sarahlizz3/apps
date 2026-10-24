@@ -5,6 +5,7 @@ import { useRecipe } from '../hooks/useRecipe';
 import { AUTO_PREPENDED_STEPS, DIFFICULTY_TIERS } from '../utils/constants';
 import { formatRecipeAsText } from '../utils/recipeFormatter';
 import DifficultyIcon from './DifficultyIcon';
+import { recipeTags } from '../utils/tags';
 
 export default function RecipeView() {
   const { recipeId } = useParams<{ recipeId: string }>();
@@ -36,7 +37,7 @@ export default function RecipeView() {
     : null;
 
   async function handleShare() {
-    const text = formatRecipeAsText(recipe!);
+    const text = formatRecipeAsText({ ...recipe!, tags: recipeTags(recipe!) });
 
     if (navigator.share) {
       try {
@@ -69,6 +70,7 @@ export default function RecipeView() {
 <style>
   body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; color: #222; }
   h1 { margin-bottom: 0.25rem; }
+  .desc { margin: 0 0 0.5rem; font-style: italic; }
   .meta { color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
   h2 { font-size: 1.1rem; margin-top: 1.5rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem; }
   ul { padding-left: 1.25rem; }
@@ -76,7 +78,8 @@ export default function RecipeView() {
   li { margin-bottom: 0.35rem; }
 </style></head><body>
   <h1>${recipe!.title}</h1>
-  ${metaParts.length > 0 ? `<p class="meta">${metaParts.join(' &middot; ')}${recipe!.category ? ` &middot; ${recipe!.category}` : ''}</p>` : recipe!.category ? `<p class="meta">${recipe!.category}</p>` : ''}
+  ${recipe!.description ? `<p class="desc">${recipe!.description}</p>` : ''}
+  ${[...metaParts, ...recipeTags(recipe!)].length > 0 ? `<p class="meta">${[...metaParts, ...recipeTags(recipe!)].join(' &middot; ')}</p>` : ''}
   <h2>Ingredients</h2>
   <ul>${recipe!.ingredients.map((i) => `<li>${i}</li>`).join('')}</ul>
   <h2>Directions</h2>
@@ -104,6 +107,9 @@ export default function RecipeView() {
         </Link>
         <h2 className="text-xl font-bold text-body truncate">{recipe.title}</h2>
       </div>
+      {recipe.description && (
+        <p className="text-secondary -mt-2 mb-4">{recipe.description}</p>
+      )}
 
       {/* Desktop action buttons */}
       <div className="hidden md:flex items-center gap-2 mb-4">
@@ -174,10 +180,10 @@ export default function RecipeView() {
                 </span>
               </div>
             )}
-            {recipe.category && (
-              <div className="flex justify-between">
-                <span className="text-secondary">Category</span>
-                <span className="text-body font-medium">{recipe.category}</span>
+            {recipeTags(recipe).length > 0 && (
+              <div className="flex justify-between gap-4">
+                <span className="text-secondary">Tags</span>
+                <span className="text-body font-medium text-right">{recipeTags(recipe).join(', ')}</span>
               </div>
             )}
           </div>

@@ -23,11 +23,16 @@ const NOTES_INLINE_RE = new RegExp(
   'i',
 );
 
+/**
+ * Metadata labels must start the line (after an optional bullet). Unanchored,
+ * these matched inside steps -- "7. Pressure cook: Seal and cook..." became the
+ * cook time and the step vanished from the directions.
+ */
 const METADATA_PATTERNS = {
-  prepTime: /(?:prep(?:\s*time)?)\s*[:=]\s*(.+)/i,
-  cookTime: /(?:cook(?:\s*time)?)\s*[:=]\s*(.+)/i,
+  prepTime: /^(?:[-*\u2022]\s*)?prep(?:aration)?(?:\s*time)?\s*[:=]\s*(.+)/i,
+  cookTime: /^(?:[-*\u2022]\s*)?cook(?:ing)?(?:\s*time)?\s*[:=]\s*(.+)/i,
   servings:
-    /(?:serv(?:es|ings?)?|yield)\s*[:=]\s*(.+)/i,
+    /^(?:[-*\u2022]\s*)?(?:serv(?:es|ings?)|yield)\s*[:=]\s*(.+)/i,
 };
 
 const MEASUREMENT_RE =
@@ -108,7 +113,13 @@ function extractMetadata(
   lines: string[]
 ): { prepTime?: string; cookTime?: string; servings?: string } {
   const meta: { prepTime?: string; cookTime?: string; servings?: string } = {};
+  // Same rule as the main loop: nothing under the directions header is
+  // metadata, so a step can't be mistaken for a time or yield.
+  let inDirections = false;
   for (const line of lines) {
+    if (DIRECTION_SECTION_RE.test(line)) { inDirections = true; continue; }
+    if (INGREDIENT_SECTION_RE.test(line) || NOTES_SECTION_RE.test(line)) { inDirections = false; continue; }
+    if (inDirections) continue;
     for (const [key, regex] of Object.entries(METADATA_PATTERNS)) {
       const match = line.match(regex);
       if (match) {
@@ -121,6 +132,7 @@ function extractMetadata(
 
 export function parseRecipeText(text: string): {
   title: string;
+  description?: string;
   ingredients: string[];
   directions: string[];
   notes?: string;
@@ -139,6 +151,10 @@ export function parseRecipeText(text: string): {
   const notesSections: { heading: string; lines: string[] }[] = [];
   let currentSection: 'none' | 'ingredients' | 'directions' | 'notes' = 'none';
   let titleFound = false;
+  // Lines between the title and the first section header ("INGREDIENTS",
+  // "STEPS"...) are a subtitle or descriptor, e.g. "Grandma's dolmathes,
+  // unrolled". They used to be dropped.
+  const descriptionLines: string[] = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -147,9 +163,13 @@ export function parseRecipeText(text: string): {
     // Skip web artifacts and ads
     if (isWebArtifact(line) || isAdvertisement(line)) continue;
 
-    // Skip metadata lines (already extracted)
-    const isMetadata = Object.values(METADATA_PATTERNS).some((r) => r.test(line));
-    if (isMetadata) continue;
+    // Skip metadata lines (already extracted). Never inside the directions:
+    // a step that starts "Cook: ..." is a step, and dropping it loses part of
+    // the recipe.
+    if (currentSection !== 'directions') {
+      const isMetadata = Object.values(METADATA_PATTERNS).some((r) => r.test(line));
+      if (isMetadata) continue;
+    }
 
     // Check for section headers
     if (INGREDIENT_SECTION_RE.test(line)) {
@@ -182,7 +202,9 @@ export function parseRecipeText(text: string): {
     }
 
     // Accumulate into current section
-    if (currentSection === 'ingredients') {
+    if (currentSection === 'none') {
+      descriptionLines.push(line);
+    } else if (currentSection === 'ingredients') {
       const cleaned = cleanIngredientLine(line);
       if (cleaned && !isWebArtifact(cleaned)) {
         ingredients.push(cleaned);
@@ -208,6 +230,8 @@ export function parseRecipeText(text: string): {
       }
     }
   }
+
+  const hadSections = ingredients.length > 0 || directions.length > 0;
 
   // Fallback: no clear sections found, use heuristics
   if (ingredients.length === 0 && directions.length === 0) {
@@ -240,8 +264,14 @@ export function parseRecipeText(text: string): {
     }
   }
 
+  // Only trust the descriptor when the paste had real sections. Without them,
+  // the fallback above sorts those same lines into ingredients/directions.
+  const description =
+    hadSections && descriptionLines.length > 0 ? descriptionLines.join(' ') : undefined;
+
   return {
     title,
+    description,
     ingredients,
     directions,
     notes,
