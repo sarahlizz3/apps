@@ -7,6 +7,7 @@ const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
 interface ExtractedRecipe {
   title: string;
+  description?: string;
   ingredients: string[];
   directions: string[];
   prepTime?: string;
@@ -14,6 +15,17 @@ interface ExtractedRecipe {
   servings?: string;
   imageUrl?: string;
   sourceUrl: string;
+}
+
+/**
+ * Sites often put HTML tags or entities (&amp;, &#39;) in the description.
+ * Reduce it to plain text; empty becomes undefined.
+ */
+function plainText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const text = new DOMParser().parseFromString(value, 'text/html').body.textContent ?? '';
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+  return cleaned || undefined;
 }
 
 /**
@@ -178,6 +190,7 @@ export async function extractRecipeFromUrl(
 
         return {
           title: String(recipe.name || '').trim(),
+          description: plainText(recipe.description),
           ingredients,
           directions,
           prepTime: parseIsoDuration(recipe.prepTime as string),
@@ -207,8 +220,14 @@ export async function extractRecipeFromUrl(
     );
   }
 
+  const ogDescription = plainText(
+    doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ??
+      doc.querySelector('meta[name="description"]')?.getAttribute('content'),
+  );
+
   return {
     title: ogTitle.trim(),
+    description: ogDescription,
     ingredients: [],
     directions: [],
     imageUrl: ogImage,
