@@ -13,7 +13,7 @@ export interface LauncherSettings {
   externalApps: ExternalApp[];
 }
 
-const DEFAULT_ORDER = ['packing', 'health', 'recipes'];
+export const DEFAULT_ORDER = ['packing', 'health', 'recipes', 'travel'];
 const DEFAULTS: LauncherSettings = { appOrder: DEFAULT_ORDER, externalApps: [] };
 
 function settingsDoc(uid: string) {
@@ -25,8 +25,11 @@ export async function getLauncherSettings(uid: string): Promise<LauncherSettings
     const snap = await getDoc(settingsDoc(uid));
     if (!snap.exists()) return DEFAULTS;
     const data = snap.data();
+    // A saved order predates any app added since, so append missing apps at the end.
+    const saved: string[] = data.appOrder ?? DEFAULT_ORDER;
+    const appOrder = [...saved, ...DEFAULT_ORDER.filter((k) => !saved.includes(k))];
     return {
-      appOrder: data.appOrder ?? DEFAULT_ORDER,
+      appOrder,
       externalApps: data.externalApps ?? [],
     };
   } catch (e) {

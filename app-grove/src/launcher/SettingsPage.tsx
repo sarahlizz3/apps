@@ -14,6 +14,7 @@ const BUILTIN_APPS: Record<string, string> = {
   packing: 'Packing List',
   health: 'Health Dashboard',
   recipes: 'Recipes',
+  travel: 'Travel Tracker',
 };
 
 export default function SettingsPage() {

@@ -5,7 +5,7 @@ import { useTheme } from '../shared/ThemeContext';
 import { signOut } from '../shared/auth';
 import AppGroveLogo from '../shared/AppGroveLogo';
 import DifficultyIcon from '../recipes/components/DifficultyIcon';
-import { getLauncherSettings, type ExternalApp } from './launcherSettings';
+import { DEFAULT_ORDER, getLauncherSettings, type ExternalApp } from './launcherSettings';
 
 interface AppDef {
   key: string;
@@ -53,9 +53,21 @@ const BUILTIN_APPS: Record<string, AppDef> = {
     iconColor: 'text-accent-recipes',
     icon: <DifficultyIcon tier="rice-bowl" size="xl" />,
   },
+  travel: {
+    key: 'travel',
+    name: 'Travel Tracker',
+    description: "Countries, states, provinces and territories you've visited",
+    path: '/travel',
+    iconBg: 'bg-accent-travel/15',
+    iconColor: 'text-accent-travel',
+    icon: (
+      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0c2.5-2.5 3.75-5.5 3.75-9S14.5 5.5 12 3m0 18c-2.5-2.5-3.75-5.5-3.75-9S9.5 5.5 12 3M3.5 9h17M3.5 15h17" />
+      </svg>
+    ),
+  },
 };
 
-const DEFAULT_ORDER = ['packing', 'health', 'recipes'];
 
 export default function LauncherPage() {
   const { user } = useAuth();

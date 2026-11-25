@@ -20,6 +20,9 @@ import HealthApp from './health/HealthApp';
 // Recipe app
 import RecipeApp from './recipes/components/RecipeApp';
 
+// Travel tracker
+import TravelApp from './travel/TravelApp';
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -48,6 +51,9 @@ export default function App() {
 
                     {/* Recipes */}
                     <Route path="/recipes/*" element={<RecipeApp />} />
+
+                    {/* Travel Tracker */}
+                    <Route path="/travel/*" element={<TravelApp />} />
                   </Routes>
                 </ProtectedRoute>
               }

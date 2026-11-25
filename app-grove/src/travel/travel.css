@@ -1,0 +1,81 @@
+/* Travel Tracker map colours.
+   Neighbouring places get different slots (c0–c5, set by scripts/build-travel-map.py)
+   so borders read clearly. Unvisited land: muted cool shades. Visited: brighter
+   greens — greens are reserved for visited. Home: lavender. */
+:root {
+  --tm-sea: #dce6ee;
+  --tm-edge: #eef2f5;
+  --tm-inert: #d3d8de;
+  --tm-home: #7d68c9;
+  --tm-sel: #14181d;
+  --tm-l0: #a9bccf;
+  --tm-l1: #a3c7c9;
+  --tm-l2: #b5b8d8;
+  --tm-l3: #bccbdb;
+  --tm-l4: #c9bccd;
+  --tm-l5: #c4bfd8;
+  --tm-v0: #2f8f6b;
+  --tm-v1: #3f9a48;
+  --tm-v2: #1f7a5e;
+  --tm-v3: #4fa77f;
+  --tm-v4: #2b8a3e;
+  --tm-v5: #2a8f86;
+}
+
+html.dark {
+  --tm-sea: #15121f;
+  --tm-edge: #15121f;
+  --tm-inert: #241f30;
+  --tm-home: #b9a8ef;
+  --tm-sel: #f5f7fa;
+  --tm-l0: #34465a;
+  --tm-l1: #2e4f55;
+  --tm-l2: #3d4462;
+  --tm-l3: #3a5068;
+  --tm-l4: #4a4152;
+  --tm-l5: #47445f;
+  --tm-v0: #8fd6b8;
+  --tm-v1: #a9e4a0;
+  --tm-v2: #6cc9a5;
+  --tm-v3: #c1ebc8;
+  --tm-v4: #7fdc8f;
+  --tm-v5: #9ce0d3;
+}
+
+.travel-map {
+  background: var(--tm-sea);
+  touch-action: none;
+}
+.travel-map path {
+  stroke: var(--tm-edge);
+  stroke-width: 0.6px;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+.travel-map path.p { cursor: pointer; }
+.travel-map path.c0 { fill: var(--tm-l0); }
+.travel-map path.c1 { fill: var(--tm-l1); }
+.travel-map path.c2 { fill: var(--tm-l2); }
+.travel-map path.c3 { fill: var(--tm-l3); }
+.travel-map path.c4 { fill: var(--tm-l4); }
+.travel-map path.c5 { fill: var(--tm-l5); }
+.travel-map path.v.c0 { fill: var(--tm-v0); }
+.travel-map path.v.c1 { fill: var(--tm-v1); }
+.travel-map path.v.c2 { fill: var(--tm-v2); }
+.travel-map path.v.c3 { fill: var(--tm-v3); }
+.travel-map path.v.c4 { fill: var(--tm-v4); }
+.travel-map path.v.c5 { fill: var(--tm-v5); }
+.travel-map path.p:hover { filter: brightness(1.12); }
+.travel-map path.h { fill: var(--tm-home); }
+.travel-map path.x { fill: var(--tm-inert); }
+.travel-map path.lake { fill: var(--tm-sea); stroke: none; cursor: default; }
+.travel-map path.sel { stroke: var(--tm-sel); stroke-width: 2.5px; }
+
+.tm-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  vertical-align: -1px;
+  margin-right: 5px;
+}
