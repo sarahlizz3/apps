@@ -21,7 +21,8 @@ interface MapState {
   H: number;
 }
 
-const toolBtn = 'min-h-11 px-3.5 rounded-lg border border-border bg-card text-body hover:bg-hover transition-colors inline-flex items-center';
+// Full 44px touch targets on phones; compact on laptop-width screens.
+const toolBtn = 'min-h-11 px-3.5 sm:min-h-8 sm:px-2.5 sm:text-sm rounded-lg border border-border bg-card text-body hover:bg-hover transition-colors inline-flex items-center';
 
 export default function MapView({ travel }: { travel: Travel }) {
   const { uid, places, byId, mapError, visits, visitById, home } = travel;
@@ -157,7 +158,7 @@ export default function MapView({ travel }: { travel: Travel }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 pt-3 pb-2.5 shrink-0">
+      <div className="px-4 py-2.5 sm:py-2 shrink-0 flex flex-wrap items-center gap-x-6 gap-y-2">
         <div className="flex flex-wrap gap-2">
           <Link to="visited" className={toolBtn}>Visited</Link>
           <button type="button" className={toolBtn} onClick={() => { setSelectedId(null); setQuery(''); setSearching(true); }}>
@@ -166,7 +167,7 @@ export default function MapView({ travel }: { travel: Travel }) {
           <Link to="settings" className={toolBtn}>Settings</Link>
         </div>
         {counts && (
-          <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2.5" aria-live="polite">
+          <div className="flex flex-wrap gap-x-5 gap-y-1" aria-live="polite">
             <Stat n={counts.countries} label={`of ${counts.countriesTotal} countries`} />
             <Stat n={counts.states} label="of 50 US states" />
             <Stat n={counts.provinces} label="of 13 Canadian provinces and territories" />
@@ -189,8 +190,8 @@ export default function MapView({ travel }: { travel: Travel }) {
           {homeShown && <span><i className="tm-swatch" style={{ background: 'var(--tm-home)' }} />Home</span>}
         </div>
         <div className="absolute right-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] flex flex-col gap-1.5">
-          <button type="button" className={`${toolBtn} w-11 justify-center text-xl px-0`} aria-label="Zoom in" onClick={() => zoomBy(1.8)}>+</button>
-          <button type="button" className={`${toolBtn} w-11 justify-center text-xl px-0`} aria-label="Zoom out" onClick={() => zoomBy(1 / 1.8)}>&minus;</button>
+          <button type="button" className={`${toolBtn} w-11 sm:w-9 sm:min-h-9 justify-center text-xl sm:text-lg px-0`} aria-label="Zoom in" onClick={() => zoomBy(1.8)}>+</button>
+          <button type="button" className={`${toolBtn} w-11 sm:w-9 sm:min-h-9 justify-center text-xl sm:text-lg px-0`} aria-label="Zoom out" onClick={() => zoomBy(1 / 1.8)}>&minus;</button>
         </div>
       </div>
 
@@ -257,8 +258,8 @@ export default function MapView({ travel }: { travel: Travel }) {
 function Stat({ n, label }: { n: number; label: string }) {
   return (
     <div className="flex items-baseline gap-1.5 whitespace-nowrap">
-      <b className="text-xl text-heading tabular-nums">{n}</b>
-      <span className="text-sm text-secondary">{label}</span>
+      <b className="text-xl sm:text-base text-heading tabular-nums">{n}</b>
+      <span className="text-sm sm:text-xs text-secondary">{label}</span>
     </div>
   );
 }
